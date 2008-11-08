@@ -38,7 +38,7 @@ my $class = Module::Build->subclass(
 			my $prj = 'toiplan-mtplugin-directory';
 			my $ver = $self->dist_version;
 			my $dist_dir = $self->dist_dir;
-			my $name = $self->module_name;
+			my $name = $self->dist_name;
 
 			$self->depends_on('dist');
 			#$self->_call_action('distdir');

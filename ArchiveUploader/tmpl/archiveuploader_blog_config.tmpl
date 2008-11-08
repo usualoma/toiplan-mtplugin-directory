@@ -1,0 +1,77 @@
+<input type="hidden" id="archive_uploader_config_beacon" name="archive_uploader_config_beacon" value="1"/>
+
+<style type="text/css">
+.extensions {
+    font-weight: bold;
+}
+</style>
+
+<mtapp:setting
+	id="archive_asset_select_file"
+	label="<__trans phrase="Upload Asset archive file.">"
+>
+<ul><li>
+<input type="submit" id="archive_asset_select_file" value="<__trans phrase="Select File">"/>
+</li></ul>
+
+</mtapp:setting>
+
+<mtapp:setting
+	id="archive_index_select_file"
+	label="<__trans phrase="Upload Index-template archive file.">"
+>
+<ul><li>
+<input type="submit" id="archive_index_select_file" value="<__trans phrase="Select File">"/>
+</li></ul>
+
+</mtapp:setting>
+
+<__trans phrase="The file with the following extensions can be uploaded."><br />
+<mt:If tag="ArchiveUploaderZIP">
+<span class="extensions">.zip</span>
+&nbsp;
+</mt:If>
+<mt:If tag="ArchiveUploaderTGZ">
+<span class="extensions">.tgz</span>
+&nbsp;
+</mt:If>
+<span class="extensions">.tar</span>
+
+<script type="text/javascript">
+setTimeout(function() {
+	var beacon = document.getElementById('archive_uploader_config_beacon');
+	var divs = beacon.form.getElementsByTagName('div');
+	for (var i = 0; i < divs.length; i++) {
+		if (divs[i].className.match(/settings-actions-bar/)) {
+			divs[i].style.display = 'none';
+		}
+	}
+}, 1000);
+(function() {
+
+var blog_id = document.getElementById('archive_uploader_config_beacon').form['blog_id'].value;
+
+document.getElementById('archive_asset_select_file').onclick = function() {
+	openDialog(
+		false,
+		'archive_asset_select_file',
+		'blog_id=' + blog_id
+	);
+
+	return false;
+};
+
+document.getElementById('archive_index_select_file').onclick = function() {
+	openDialog(
+		false,
+		'archive_index_select_file',
+		'blog_id=' + blog_id
+	);
+
+	return false;
+};
+
+
+})();
+</script>
+

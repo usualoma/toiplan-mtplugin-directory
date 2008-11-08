@@ -1,0 +1,29 @@
+#plugin information
+id: ArchiveUploader
+name: ArchiveUploader
+version: 0.1.0.0
+
+#about this plugin
+description: <__trans phrase="A plugin which help to upload asset and index-template.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/archiveuploader/
+doc_link: http://tec.toi-planning.net/mt/archiveuploader/manual
+
+#Localization
+l10n_class: ArchiveUploader::L10N
+
+blog_config_template: archiveuploader_blog_config.tmpl
+
+tags:
+    function:
+        ArchiveUploaderZIP: ArchiveUploader::App::tag_hdlr_zip
+        ArchiveUploaderTGZ: ArchiveUploader::App::tag_hdlr_tgz
+
+applications:
+    cms:
+        methods:
+            archive_asset_select_file: ArchiveUploader::App::archive_asset_select_file
+            archive_asset_upload_file: ArchiveUploader::App::archive_asset_upload_file
+            archive_index_select_file: ArchiveUploader::App::archive_index_select_file
+            archive_index_upload_file: ArchiveUploader::App::archive_index_upload_file

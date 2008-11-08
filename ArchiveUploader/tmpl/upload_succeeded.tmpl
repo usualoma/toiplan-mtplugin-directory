@@ -1,0 +1,21 @@
+<mt:setvarblock name="page_title"><__trans phrase="Upload Succeeded."></mt:setvarblock>
+
+<mt:include name="dialog/header.tmpl">
+
+<textarea readonly="readonly" style="width: 100%; height: 100%;"><mt:Loop name="logs"><mt:Var name="__value__"></mt:Loop></textarea>
+
+<form>
+    <div class="actions-bar">
+        <div class="actions-bar-inner actions">
+            <button
+                type="submit"
+                accesskey="s"
+                title="<__trans phrase="Finish (s)">"
+                class="primary-button"
+				onclick="closeDialog(''); return false;"
+                ><__trans phrase="Finish"></button>
+        </div>
+    </div>
+</form>
+
+<mt:include name="dialog/footer.tmpl">

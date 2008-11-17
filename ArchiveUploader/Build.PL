@@ -62,6 +62,29 @@ my $class = Module::Build->subclass(
 			system("zip -r $dist_dir.zip $dist_dir") == 0 or die $?;
 			$self->delete_filetree($dist_dir);
 		}
+
+		sub ACTION_distdir {
+			my ($self) = @_;
+
+			$_[0]->SUPER::ACTION_distdir(@_);
+
+			my $dist_dir = $self->dist_dir;
+			rename($dist_dir, $self->{properties}{dist_name});
+			use File::Path;
+			use File::Spec;
+			use File::Basename;
+			my $plugins = File::Spec->catfile($dist_dir, 'plugins');
+			mkpath($plugins, 1, 0755);
+
+			my $new_dist_dir = File::Spec->catfile(
+				$plugins, $self->{properties}{dist_name}
+			);
+			rename($self->{properties}{dist_name}, $new_dist_dir);
+
+			foreach my $f (glob(File::Spec->catfile($new_dist_dir, 'LIC*'))) {
+				rename($f, File::Spec->catfile($dist_dir, basename($f)));
+			}
+		}
 	}
 );
 

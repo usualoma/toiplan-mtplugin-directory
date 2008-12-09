@@ -1,0 +1,52 @@
+<input type="hidden" name="enhancedblogcreating_plugin_beacon" value="1" />
+
+<mtapp:setting
+    id="file_extension"
+    label="<__trans phrase="File Extension">"
+    hint="<__trans phrase="Enter the archive file extension. This can take the form of 'html', 'shtml', 'php', etc. Note: Do not enter the leading period ('.').">"
+    help_page="blog_setting_publishing"
+    help_section="archive_file_extension">
+    <input name="file_extension" id="file_extension" size="5" value="<mt:var name="file_extension" escape="html">" />
+</mtapp:setting>
+
+<mtapp:setting
+    id="include_cache"
+    label="<__trans phrase="Module Caching">"
+    content_class="field-content-text"
+    help_page="blog_settings_publishing"
+    help_section="include_cache">
+    <input id="include_cache" type="checkbox" name="include_cache" value="1"<mt:if name="include_cache"> checked="checked"</mt:if>/> <label for="include_cache"><__trans phrase="Enable template module caching"></label>
+</mtapp:setting>
+
+<mtapp:setting
+    id="include_system"
+    label="<__trans phrase="Server Side Includes">"
+    content_class="field-content-text"
+    help_page="blog_settings_publishing"
+    help_section="ssi">
+    <select id="include_system" name="include_system">
+      <option value=""<mt:unless name="include_system"> selected="selected"</mt:unless>><__trans phrase="None (disabled)"></option>
+      <option value="php"<mt:if name="include_system" eq="php"> selected="selected"</mt:if>><__trans phrase="PHP Includes"></option>
+      <option value="shtml"<mt:if name="include_system" eq="shtml"> selected="selected"</mt:if>><__trans phrase="Apache Server-Side Includes"></option>
+      <option value="asp"<mt:if name="include_system" eq="asp"> selected="selected"</mt:if>><__trans phrase="Active Server Page Includes"></option>
+      <option value="jsp"<mt:if name="include_system" eq="jsp"> selected="selected"</mt:if>><__trans phrase="Java Server Page Includes"></option>
+    </select>
+</mtapp:setting>
+
+<script type="text/javascript">
+(function() {
+	var orig = validate;
+	validate = function(f) {
+		if (! orig(f)) {
+			return false;
+		}
+
+		if (! f.file_extension.value) {
+        	alert('<__trans phrase="You must set File Extension." escape="singlequotes">');
+			return false;
+		}
+
+	    return true;
+	};
+})();
+</script>

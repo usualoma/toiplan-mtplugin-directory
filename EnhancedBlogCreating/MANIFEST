@@ -1,0 +1,9 @@
+config.yaml
+lib/EnhancedBlogCreating.pm
+lib/EnhancedBlogCreating/L10N.pm
+lib/EnhancedBlogCreating/L10N/en_us.pm
+lib/EnhancedBlogCreating/L10N/ja.pm
+LICENSE
+t/00.load.t
+tmpl/archiveuploader_blog_config.tmpl
+tmpl/upload_succeeded.tmpl

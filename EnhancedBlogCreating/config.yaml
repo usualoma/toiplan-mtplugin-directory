@@ -1,0 +1,18 @@
+#plugin information
+name: EnhancedBlogCreating
+version: 0.1.0.0
+
+#about this plugin
+description: <__trans phrase="This plug-in is able to set more detailed information when creating blog.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/enhancedblogcreating/
+doc_link: http://tec.toi-planning.net/mt/enhancedblogcreating/manual
+
+#Localization
+l10n_class: EnhancedBlogCreating::L10N
+
+callbacks:
+    MT::App::CMS::init_request: EnhancedBlogCreating::init_request
+    MT::Blog::pre_insert: EnhancedBlogCreating::blog_pre_insert
+    MT::App::CMS::template_source.edit_blog: EnhancedBlogCreating::source_edit_blog

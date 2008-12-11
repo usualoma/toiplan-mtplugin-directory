@@ -21,6 +21,7 @@
 # $Id$
 
 package EnhancedBlogCreating;
+use strict;
 
 my $instance = undef;
 sub instance {
@@ -34,15 +35,17 @@ sub init_request {
 	instance($cb->{plugin});
 }
 
-my @keys = qw(file_extension include_cache include_system);
+my @keys = qw(
+	file_extension include_cache include_system
+	status_default convert_paras allow_comments_default allow_pings_default
+);
 sub blog_pre_insert {
 	my ($cb, $obj) = @_;
 	my $app = MT->instance;
 
 	return if !($app->can('param')); # God knows where we'll be coming from!
 	return if !($app->param('enhancedblogcreating_plugin_beacon'));
-
-	$obj->$_($app->param($_)) foreach (@keys);
+	$obj->$_($app->param($_) || 0) foreach (@keys);
 }
 
 sub source_edit_blog {
@@ -61,6 +64,37 @@ sub source_edit_blog {
 
     my %param = ();
 	$param{$_} = $blog->$_ foreach (@keys);
+	$param{ALLOW_COMMENTS_DEFAULT_1} = ($param{allow_comments_default} == 1);
+	$param{STATUS_DEFAULT_1} = ($param{status_default} == 1);
+	$param{STATUS_DEFAULT_2} = ($param{status_default} == 2);
+
+	my $cfg = $app->config;
+	$param{system_allow_comments} = $cfg->AllowComments;
+	$param{system_allow_pings} = $cfg->AllowPings;
+
+    my $filters = MT->all_text_filters;
+    $param{text_filters} = [];
+    for my $filter ( keys %$filters ) {
+        if (my $cond = $filters->{$filter}{condition}) {
+            $cond = MT->handler_to_coderef($cond) if !ref($cond);
+            next unless $cond->( 'entry' );
+        }
+        push @{ $param{text_filters} },
+          {
+            key      => $filter,
+            label    => $filters->{$filter}{label},
+            selected => ($param{convert_paras} eq $filter),
+          };
+    }
+    $param{text_filters} =
+      [ sort { $a->{filter_key} cmp $b->{filter_key} }
+          @{ $param{text_filters} } ];
+    unshift @{ $param{text_filters} },
+      {
+        key      => '0',
+        label    => $app->translate('None'),
+      };
+
 	my $html = $plugin->load_tmpl('edit_blog.tmpl', \%param )->output;
 
 	my $replace = '\s*<mt:setvarblock name="action_buttons">\s*';

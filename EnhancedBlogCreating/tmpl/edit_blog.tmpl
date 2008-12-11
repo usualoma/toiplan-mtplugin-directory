@@ -33,6 +33,62 @@
     </select>
 </mtapp:setting>
 
+<mtapp:settinggroup id="entry-settings">
+
+<h3><__trans phrase="New Entry Defaults"></h3>
+
+    <mtapp:setting
+        id="status_default"
+        label="<__trans phrase="Entry Status">"
+        hint="<__trans phrase="Specifies the default Entry Status when creating a new entry.">">
+        <select name="status_default" id="status_default">
+        <option value="1"<mt:if name="STATUS_DEFAULT_1"> selected="selected"</mt:if>><__trans phrase="Unpublished"></option>
+        <option value="2"<mt:if name="STATUS_DEFAULT_2"> selected="selected"</mt:if>><__trans phrase="Published"></option>
+        </select>
+    </mtapp:setting>
+
+    <mtapp:setting
+        id="convert_paras"
+        label="<__trans phrase="Text Formatting">"
+        hint="<__trans phrase="Specifies the default Text Formatting option when creating a new entry.">"
+        help_page="blog_settings_entry_defaults"
+        help_section="text_formatting">
+        <select name="convert_paras" id="convert_paras">
+        <mt:loop name="text_filters">
+        <option value="<mt:var name="key" escape="html">"<mt:if name="selected"> selected="selected"</mt:if>><mt:var name="label" escape="html"></option>
+        </mt:loop>
+        </select>
+    </mtapp:setting>
+
+    <mtapp:setting
+        id="allow_comments_default"
+        label="<__trans phrase="Accept Comments">"
+        content_class="field-content-text"
+        help_page="blog_settings_entry_defaults"
+        help_section="accept_comments"
+        hint="<__trans phrase="Specifies the default Accept Comments setting when creating a new entry.">">
+        <input type="checkbox" name="allow_comments_default" id="allow_comments_default" value="1"<mt:if name="ALLOW_COMMENTS_DEFAULT_1"> checked="checked"</mt:if> class="cb" />
+        <mt:unless name="system_allow_comments">
+        <p><img src="<mt:var name="static_uri">images/status_icons/warning.gif" alt="<__trans phrase="Setting Ignored">" width="9" height="9" />
+        <span class="alert-warning-inline"><__trans phrase="Note: This option is currently ignored since comments are disabled either blog or system-wide."></span></p>
+        </mt:unless>
+    </mtapp:setting>
+
+    <mtapp:setting
+        id="allow_pings_default"
+        label="<__trans phrase="Accept TrackBacks">"
+        content_class="field-content-text"
+        help_page="blog_settings_entry_defaults"
+        help_section="allow_trackbacks"
+        hint="<__trans phrase="Specifies the default Accept TrackBacks setting when creating a new entry.">">
+        <input type="checkbox" value="1" name="allow_pings_default" id="allow_pings_default"<mt:if name="allow_pings_default"> checked="checked"</mt:if> class="cb"/>
+        <mt:unless name="system_allow_pings">
+        <p><img src="<mt:var name="static_uri">images/status_icons/warning.gif" alt="<__trans phrase="Setting Ignored">" width="9" height="9" /> <span class="alert-warning-inline"><__trans phrase="Note: This option is currently ignored since TrackBacks are disabled either blog or system-wide."></span></p>
+        </mt:unless>
+    </mtapp:setting>
+
+</mtapp:settinggroup>
+
 <script type="text/javascript">
 (function() {
 	var orig = validate;

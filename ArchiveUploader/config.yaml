@@ -27,3 +27,6 @@ applications:
             archive_asset_upload_file: ArchiveUploader::App::archive_asset_upload_file
             archive_index_select_file: ArchiveUploader::App::archive_index_select_file
             archive_index_upload_file: ArchiveUploader::App::archive_index_upload_file
+
+callbacks:
+    MT::App::CMS::init_request: ArchiveUploader::init_request

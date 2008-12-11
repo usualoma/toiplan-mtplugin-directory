@@ -57,7 +57,7 @@ sub extract {
 		}
 	}
 	else {
-		my $plugin = MT->component('ArchiveUploader');
+		my $plugin = ArchiveUploader->instance;
 		$err = "[_1] is not supported filetype.";
 	}
 
@@ -88,7 +88,7 @@ sub archive_asset_select_file {
 
 sub archive_asset_upload_file {
     my $app = shift;
-	my $plugin = MT->component('ArchiveUploader');
+	my $plugin = ArchiveUploader->instance;
 
 	my %param = ('logs' => []);
 
@@ -185,7 +185,10 @@ sub archive_asset_upload_file {
 	    my $ext = ( File::Basename::fileparse( $f, qr/[A-Za-z0-9]+$/ ) )[2];
 		my $filepath = File::Spec->catfile('%r', $f);
 
-		my $obj = $asset_pkg->load({'file_path' => $filepath}) || $asset_pkg->new;
+		my $obj = $asset_pkg->load({
+			'file_path' => $filepath,
+			'blog_id' => $blog_id,
+		}) || $asset_pkg->new;
 		my $is_new = not $obj->id;
 
 		$obj->file_path($filepath);
@@ -236,7 +239,7 @@ sub archive_index_select_file {
 
 sub archive_index_upload_file {
     my $app = shift;
-	my $plugin = MT->component('ArchiveUploader');
+	my $plugin = ArchiveUploader->instance;
 
 	my %param = ('logs' => []);
 
@@ -329,7 +332,10 @@ sub archive_index_upload_file {
             css styles
         );
         
-        my $obj = $tmpl_class->load({ 'outfile' => $file }) || $tmpl_class->new;
+        my $obj = $tmpl_class->load({
+			'outfile' => $file,
+			'blog_id' => $blog_id,
+		}) || $tmpl_class->new;
 		my $is_new = not $obj->id;
 
         $obj->blog_id($blog_id);
@@ -354,7 +360,6 @@ sub archive_index_upload_file {
 		)
 	});
 
-	my $plugin = MT->component('ArchiveUploader');
 	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
 }
 

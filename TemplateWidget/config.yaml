@@ -1,0 +1,30 @@
+#plugin information
+name: TemplateWidget
+version: 0.1.0.0
+
+#about this plugin
+description: <__trans phrase="This plugin create dashboard widget from template module.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/templatewidget/
+doc_link: http://tec.toi-planning.net/mt/templatewidget/manual
+
+#Localization
+l10n_class: TemplateWidget::L10N
+
+applications:
+    cms:
+        widgets:
+            template_widgets_main:
+                label: Template widgtes
+                template: template_widgets_main.tmpl
+                handler: TemplateWidget::template_widgets_main
+                singular: 1
+                set: main
+
+            template_widgets_sidebar:
+                label: Template widgtes
+                template: template_widgets_sidebar.tmpl
+                handler: TemplateWidget::template_widgets_sidebar
+                singular: 1
+                set: sidebar

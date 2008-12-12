@@ -1,0 +1,11 @@
+<mt:If name="content">
+	<mt:Var name="content" />
+<mt:Else>
+<div style="border: 1px solid #ccc; padding: 5px;">
+	<a href="<mt:AdminCGIPath /><mt:AdminScript/>?__mode=view&_type=template&type=module&blog_id=0&name=TemplateWidget(main)"><__trans phrase="Create Global Template widgtes"></a>
+	<mt:If tag="BlogID">
+	<br />
+	<a href="<mt:AdminCGIPath /><mt:AdminScript/>?__mode=view&_type=template&type=module&blog_id=<mt:BlogID>&name=TemplateWidget(main)"><__trans phrase="Create Blog Template widgtes"></a>
+	</mt:If>
+</div>
+</mt:If>

@@ -1,0 +1,9 @@
+config.yaml
+lib/TemplateWidget.pm
+lib/TemplateWidget/L10N.pm
+lib/TemplateWidget/L10N/en_us.pm
+lib/TemplateWidget/L10N/ja.pm
+LICENSE
+t/00.load.t
+tmpl/template_widgets_main.tmpl
+tmpl/template_widgets_sidebar.tmpl

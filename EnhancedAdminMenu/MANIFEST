@@ -1,0 +1,7 @@
+config.yaml
+lib/EnhancedAdminMenu.pm
+lib/EnhancedAdminMenu/L10N.pm
+lib/EnhancedAdminMenu/L10N/en_us.pm
+lib/EnhancedAdminMenu/L10N/ja.pm
+LICENSE
+t/00.load.t

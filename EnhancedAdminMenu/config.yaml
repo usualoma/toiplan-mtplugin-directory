@@ -1,0 +1,21 @@
+#plugin information
+name: EnhancedAdminMenu
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/enhancedadminmenu/
+doc_link: http://tec.toi-planning.net/mt//enhancedadminmenumanual
+
+#Localization
+l10n_class: EnhancedAdminMenu::L10N
+
+system_config_template: system_config.tmpl
+settings:
+    list_blog_numbers:
+        Default: 20
+
+callbacks:
+    MT::App::CMS::init_request: EnhancedAdminMenu::init_request

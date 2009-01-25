@@ -57,6 +57,11 @@ sub template_widgets_main {
 		});
 	}
 
+    my $ctx = $module->context;
+	require MT::Blog;
+	$ctx->stash('blog_id', $blog_id);
+	$ctx->stash('blog', MT::Blog->load($blog_id));
+
 	if ($module) {
 		$param->{'content'} = $module->output;
 	}
@@ -83,6 +88,10 @@ sub template_widgets_sidebar {
 			name => 'TemplateWidget(sidebar)',
 		});
 	}
+
+    my $ctx = $module->context;
+	require MT::Blog;
+	$ctx->stash('blog', MT::Blog->load($blog_id));
 
 	if ($module) {
 		$param->{'content'} = $module->output;

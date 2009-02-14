@@ -1,0 +1,36 @@
+#plugin name
+name: SharedCategories
+version: 0.0.1
+
+#about this plugin
+description: <__trans phrase="Category sharing">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/sharedcategories/
+doc_link: http://tec.toi-planning.net/mt/sharedcategories/manual
+
+#Localization
+l10n_class: SharedCategories::L10N
+
+system_config_template: shared_categories_system_config.tmpl
+blog_config_template: shared_categories_blog_config.tmpl
+
+settings:
+    shared_categories_blog_id_sets:
+    shared_categories_template_ids:
+    shared_categories_fix_blog_id:
+        Default: 0
+
+tags:
+    function:
+        SharedCategoriesBlogTemplateSetLabel: SharedCategories::_hdlr_template_set_label
+    block:
+        IfSharedCategoriesByBlogID?: SharedCategories::_hdlr_if_by_blog_id
+        IfSharedCategoriesTemplateSet?: SharedCategories::_hdlr_if_template_set
+
+callbacks:
+    MT::App::CMS::init_request: SharedCategories::init_request
+    MT::App::CMS::template_source.shared_categories_blog_config: SharedCategories::source_blog_config
+    MT::App::CMS::template_source.list_category: SharedCategories::source_list_category
+    MT::PluginData::post_save: SharedCategories::plugin_data_post_save
+    MT::Category::pre_save: SharedCategories::category_pre_save

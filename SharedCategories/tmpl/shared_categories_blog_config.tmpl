@@ -1,0 +1,84 @@
+<input type="hidden" name="shared_categories_beacon" value="1"/>
+
+<mtapp:setting
+	id="blogs"
+	label="<__trans phrase="Shared by blog" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="with_blog_id" id="sc_with_blog_id" <mt:IfSharedCategoriesByBlogID blog_id="$blog_id">checked="checked"</mt:IfSharedCategoriesByBlogID> />
+</li>
+</ul>
+
+<div id="sc_with_blog_id-panel">
+<ul>
+<mt:Blogs ids="all">
+<mt:BlogID setvar="current_blog_id" />
+<mt:If var="current_blog_id" eq="$blog_id">
+<li>
+<input readonly="readonly" style="background: #ccc" type="checkbox" value="<mt:BlogID />" name="sc_blog_id" id="sc_blog_id_<mt:BlogID />" checked="checked" /><label for="sc_blog_id_<mt:BlogID />">: <mt:BlogName/></label><br/>
+</li>
+<mt:Else>
+<li>
+<input type="checkbox" value="<mt:BlogID />" name="sc_blog_id" id="sc_blog_id_<mt:BlogID />" <mt:IfSharedCategoriesByBlogID blog_id="$blog_id","\$current_blog_id">checked="checked"</mt:IfSharedCategoriesByBlogID> /><label for="sc_blog_id_<mt:BlogID />">: <mt:BlogName/></label><br/>
+</li>
+</mt:If>
+</mt:Blogs>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('sc_with_blog_id');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+})();
+</script>
+</mtapp:setting>
+
+<mtapp:setting
+	id="template_sst"
+	label="<__trans phrase="Shared by template-set" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="template_set" value="1" id="sc_template_set" <mt:IfSharedCategoriesTemplateSet>checked="checked"</mt:IfSharedCategoriesTemplateSet> />
+</li>
+</ul>
+
+<div id="sc_template_set-panel">
+<ul>
+<li>
+<mt:SharedCategoriesBlogTemplateSetLabel />
+</li>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('sc_template_set');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+})();
+</script>
+</mtapp:setting>

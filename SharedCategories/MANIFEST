@@ -1,0 +1,8 @@
+config.yaml
+lib/SharedCategories.pm
+lib/SharedCategories/L10N.pm
+lib/SharedCategories/L10N/en_us.pm
+lib/SharedCategories/L10N/ja.pm
+LICENSE
+tmpl/shared_categories_blog_config.tmpl
+tmpl/shared_categories_system_config.tmpl

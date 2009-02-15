@@ -42,6 +42,13 @@
 	
 	cb.onclick = update;
 	update();
+
+	var this_blog = getByID('sc_blog_id_$blog_id');
+	function force() {
+		this_blog.checked = 'checked';
+	}
+	this_blog.onclick = force;
+	this_blog.onchange = force;
 })();
 </script>
 </mtapp:setting>

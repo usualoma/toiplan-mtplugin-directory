@@ -268,40 +268,51 @@ sub plugin_data_post_save {
 	}
 
 
-	@$blog_id_sets = grep({
-		my $set = $_;
-		not scalar(grep({$blog_id == $_} @$set));
-	} @$blog_id_sets);
+	if ($app->param('with_blog_id')) {
+		@$blog_id_sets = grep({
+			my $set = $_;
+			not scalar(grep({$blog_id == $_} @$set));
+		} @$blog_id_sets);
 
-	my @blog_ids = $app->param('sc_blog_id');
-	if (scalar(@blog_ids) >= 2) {
-		push(@$blog_id_sets, \@blog_ids);
+		my @blog_ids = $app->param('sc_blog_id');
+		if (scalar(@blog_ids) >= 2) {
+			push(@$blog_id_sets, \@blog_ids);
 
-		my $old_blog_id_sets_length;
-		do {
-			$old_blog_id_sets_length = scalar(@$blog_id_sets);
-			my @new_id_sets = ();
+			my $old_blog_id_sets_length;
+			do {
+				$old_blog_id_sets_length = scalar(@$blog_id_sets);
+				my @new_id_sets = ();
 
-			MARGE_SET_LOOP:
-			foreach my $set (@$blog_id_sets) {
-				foreach my $nset (@new_id_sets) {
-					foreach my $id (@$set) {
-						if (grep($id == $_, @$nset)) {
-							foreach my $i (@$set) {
-								if (! grep($i == $_, @$nset)) {
-									push(@$nset, $i);
+				MARGE_SET_LOOP:
+				foreach my $set (@$blog_id_sets) {
+					foreach my $nset (@new_id_sets) {
+						foreach my $id (@$set) {
+							if (grep($id == $_, @$nset)) {
+								foreach my $i (@$set) {
+									if (! grep($i == $_, @$nset)) {
+										push(@$nset, $i);
+									}
 								}
+								next MARGE_SET_LOOP;
 							}
-							next MARGE_SET_LOOP;
 						}
 					}
+
+					push(@new_id_sets, [ @$set ]);
 				}
 
-				push(@new_id_sets, [ @$set ]);
+				$blog_id_sets = \@new_id_sets;
+			} until ($old_blog_id_sets_length == scalar(@$blog_id_sets));
+		}
+	}
+	else {
+		foreach my $set (@$blog_id_sets) {
+			for (my $i = 0; $i < scalar(@$set); $i++) {
+				if ($set->[$i] == $blog_id) {
+					splice(@$set, $i, 1);
+				}
 			}
-
-			$blog_id_sets = \@new_id_sets;
-		} until ($old_blog_id_sets_length == scalar(@$blog_id_sets));
+		}
 	}
 
 	$plugin->set_config_value(

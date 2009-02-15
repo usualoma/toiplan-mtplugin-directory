@@ -15,6 +15,7 @@ extlib/Archive/Zip/NewFileMember.pm
 extlib/Archive/Zip/StringMember.pm
 extlib/Archive/Zip/Tree.pm
 extlib/Archive/Zip/ZipFileMember.pm
+lib/ArchiveUploader.pm
 lib/ArchiveUploader/App.pm
 lib/ArchiveUploader/L10N.pm
 lib/ArchiveUploader/L10N/en_us.pm

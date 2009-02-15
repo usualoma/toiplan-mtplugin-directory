@@ -80,6 +80,18 @@ sub init_request {
 
 		MT::Object::load_iter(@_);
 	};
+
+
+	if ($plugin->get_config_value('shared_categories_cat_path_patch')) {
+        require MT::Template::ContextHandlers;
+        my $cat_path_to_category = \&MT::Template::Context::cat_path_to_category;
+        *MT::Template::Context::cat_path_to_category = sub {
+            if (! grep($_[2] eq $_, 'category', 'folder')) {
+                $_[2] = ($_[2] eq 'entry' ? 'category' : 'folder');
+            }
+            $cat_path_to_category->(@_);
+        };
+    }
 }
 
 sub category_pre_save {

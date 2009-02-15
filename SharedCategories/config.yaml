@@ -1,6 +1,6 @@
 #plugin name
 name: SharedCategories
-version: 0.0.2
+version: 0.0.3
 
 #about this plugin
 description: <__trans phrase="Category sharing">
@@ -20,6 +20,8 @@ settings:
     shared_categories_template_ids:
     shared_categories_fix_blog_id:
         Default: 0
+    shared_categories_cat_path_patch:
+        Default: 1
 
 tags:
     function:

@@ -113,9 +113,12 @@ sub archive_asset_upload_file {
 		$original_file, qr/[A-Za-z0-9]+$/
 	))[2];
 
+	my $tmp_dir = $app->config('TempDir');
 	require File::Temp;
 	my ($out, $filename) = File::Temp::tempfile(
-        undef, SUFFIX => '.' . $original_ext
+        undef,
+		($tmp_dir ? (DIR => $tmp_dir) : ()),
+		SUFFIX => '.' . $original_ext
     );
 	while (read($fh, my $cont, 512)) {
 		print($out $cont);
@@ -166,12 +169,17 @@ sub archive_asset_upload_file {
 		);
 	}
 
+    my $upload_mode = (~ oct($app->config('UploadUmask'))) & oct('777');
+    my $dir_mode = (~ oct($app->config('DirUmask'))) & oct('777');
+
 	my @files = grep({ $_ } map({
 		my $path = File::Spec->catfile($basedir, $_);
 		if (-d $path) {
+			chmod($dir_mode, $path);
 			'';
 		}
 		else {
+			chmod($upload_mode, $path);
 			File::Spec->catfile($short_path, $_);
 		}
 	} @$extracted));

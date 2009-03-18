@@ -81,6 +81,19 @@ sub init_request {
 		MT::Object::load_iter(@_);
 	};
 
+	my $count = *MT::Category::count;
+	*MT::Category::count = sub {
+		my ($class, $args, $cond) = @_;
+
+		if (ref $args) {
+			if (my $blog_id = &replace_blog_id($args->{'blog_id'} || 0)) {
+				$args->{'blog_id'} = $blog_id;
+			}
+		}
+
+		MT::Object::count(@_);
+	};
+
 
 	if ($plugin->get_config_value('shared_categories_cat_path_patch')) {
         require MT::Template::ContextHandlers;

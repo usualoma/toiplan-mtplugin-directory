@@ -1,0 +1,19 @@
+#plugin name
+name: Holiday
+version: 0.0.1
+
+#about this plugin
+description: <__trans phrase="List holidays">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/holiday/
+doc_link: http://tec.toi-planning.net/mt/holiday/manual
+
+#Localization
+l10n_class: Holiday::L10N
+
+tags:
+    function:
+        HolidayDate: Holiday::_hdlr_date
+    block: 
+        Holidays: Holiday::_hdlr_days

@@ -1,0 +1,14 @@
+#plugin name
+name: Shell
+version: 0.0.1
+
+#about this plugin
+description: <__trans phrase="Execute command">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/shell/
+doc_link: http://tec.toi-planning.net/mt/shell/manual
+
+tags:
+    block: 
+        ShellExecute: Shell::_hdlr_execute

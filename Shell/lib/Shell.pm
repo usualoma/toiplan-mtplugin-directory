@@ -26,7 +26,7 @@ use strict;
 
 sub _hdlr_execute
 {
-    my($ctx, $args, $cond) = @_;
+	my($ctx, $args, $cond) = @_;
 	my $cmd = $args->{'command'} or return;
 	my $status_var = $args->{'status'} || '';
 	my @argv = ();
@@ -49,8 +49,8 @@ sub _hdlr_execute
 		}
 	}
 
-    my $builder = $ctx->stash('builder');
-    my $tokens = $ctx->stash('tokens');
+	my $builder = $ctx->stash('builder');
+	my $tokens = $ctx->stash('tokens');
 
 	my $input = $builder->build($ctx, $tokens, $cond);
 
@@ -67,7 +67,7 @@ sub _hdlr_execute
 		$ctx->var($status_var, $status);
 	}
 
-    $res;
+	$res;
 }
 
 1;

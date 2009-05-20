@@ -1,6 +1,6 @@
 #plugin name
 name: SharedCategories
-version: 0.0.4
+version: 0.0.5
 
 #about this plugin
 description: <__trans phrase="Category sharing">

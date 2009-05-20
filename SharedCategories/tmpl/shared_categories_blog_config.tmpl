@@ -1,5 +1,9 @@
 <input type="hidden" name="shared_categories_beacon" value="1"/>
 
+<p style="border-bottom: 1px solid #ccc;">
+<__trans phrase="Settings for categories.">
+</p>
+
 <mtapp:setting
 	id="sc_with_blog_id"
 	label="<__trans phrase="Shared by blog" />"
@@ -74,6 +78,100 @@
 <script type="text/javascript">
 (function() {
 	var cb = getByID('sc_template_set');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+})();
+</script>
+</mtapp:setting>
+
+<p style="border-bottom: 1px solid #ccc;">
+<__trans phrase="Settings for folders.">
+</p>
+
+<mtapp:setting
+	id="sc_with_blog_id_folder"
+	label="<__trans phrase="Shared by blog" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="with_blog_id_folder" id="sc_with_blog_id_folder" <mt:IfSharedCategoriesByBlogIDFolder blog_id="$blog_id">checked="checked"</mt:IfSharedCategoriesByBlogIDFolder> />
+</li>
+</ul>
+
+<div id="sc_with_blog_id_folder-panel">
+<ul>
+<mt:Blogs ids="all">
+<mt:BlogID setvar="current_blog_id" />
+<mt:If var="current_blog_id" eq="$blog_id">
+<li>
+<input readonly="readonly" style="background: #ccc" type="checkbox" value="<mt:BlogID />" name="sc_blog_id_folder" id="sc_blog_id_folder_<mt:BlogID />" checked="checked" /><label for="sc_blog_id_folder_<mt:BlogID />">: <mt:BlogName/></label><br/>
+</li>
+<mt:Else>
+<li>
+<input type="checkbox" value="<mt:BlogID />" name="sc_blog_id_folder" id="sc_blog_id_folder_<mt:BlogID />" <mt:IfSharedCategoriesByBlogIDFolder blog_id="$blog_id","\$current_blog_id">checked="checked"</mt:IfSharedCategoriesByBlogIDFolder> /><label for="sc_blog_id_folder_<mt:BlogID />">: <mt:BlogName/></label><br/>
+</li>
+</mt:If>
+</mt:Blogs>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('sc_with_blog_id_folder');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+
+	var this_blog = getByID('sc_blog_id_folder_$blog_id');
+	function force() {
+		this_blog.checked = 'checked';
+	}
+	this_blog.onclick = force;
+	this_blog.onchange = force;
+})();
+</script>
+</mtapp:setting>
+
+<mtapp:setting
+	id="sc_template_set_folder"
+	label="<__trans phrase="Shared by template-set" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="template_set_folder" value="1" id="sc_template_set_folder" <mt:IfSharedCategoriesTemplateSetFolder>checked="checked"</mt:IfSharedCategoriesTemplateSetFolder> />
+</li>
+</ul>
+
+<div id="sc_template_set_folder-panel">
+<ul>
+<li>
+<mt:SharedCategoriesBlogTemplateSetLabelFolder />
+</li>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('sc_template_set_folder');
 
 	function update() {
 		if (cb.checked) {

@@ -14,6 +14,8 @@ use vars qw( %Lexicon );
 
 	'Fix blog id' => 'ブログIDを親カテゴリーに合わせる',
     'Fix a bug for MTEntries' => 'MTEntries の category 指定時の不具合を修正する',
+	'Settings for folders.' => 'フォルダの設定',
+	'Settings for categories.' => 'カテゴリーの設定',
 );
 
 1;

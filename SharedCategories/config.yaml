@@ -23,16 +23,26 @@ settings:
     shared_categories_cat_path_patch:
         Default: 1
 
+    shared_categories_blog_id_sets_folder:
+    shared_categories_template_ids_folder:
+    shared_categories_fix_blog_id_folder:
+        Default: 0
+
 tags:
     function:
         SharedCategoriesBlogTemplateSetLabel: SharedCategories::_hdlr_template_set_label
+        SharedCategoriesBlogTemplateSetLabelFolder: SharedCategories::_hdlr_template_set_label
     block:
         IfSharedCategoriesByBlogID?: SharedCategories::_hdlr_if_by_blog_id
         IfSharedCategoriesTemplateSet?: SharedCategories::_hdlr_if_template_set
+        IfSharedCategoriesByBlogIDFolder?: SharedCategories::_hdlr_if_by_blog_id
+        IfSharedCategoriesTemplateSetFolder?: SharedCategories::_hdlr_if_template_set
 
 callbacks:
     MT::App::CMS::init_request: SharedCategories::init_request
     MT::App::CMS::template_source.shared_categories_blog_config: SharedCategories::source_blog_config
-    MT::App::CMS::template_source.list_category: SharedCategories::source_list_category
     MT::PluginData::post_save: SharedCategories::plugin_data_post_save
+    MT::App::CMS::template_source.list_category: SharedCategories::source_list_category
     MT::Category::pre_save: SharedCategories::category_pre_save
+    MT::App::CMS::template_source.list_folder: SharedCategories::source_list_folder
+    MT::Folder::pre_save: SharedCategories::folder_pre_save

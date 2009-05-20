@@ -5,15 +5,16 @@ use strict;
 my $plugin = undef;
 
 sub replace_blog_id {
+	my $type = shift;
 	my @blog_ids = ref $_[0] ? @{ $_[0] } : ($_[0] ? @_ : ());
 
     my $blog_id_sets = $plugin->get_config_value(
-        'shared_categories_blog_id_sets'
+        'shared_categories_blog_id_sets' . ($type eq 'folder' ? '_folder' : '')
     ) || [];
 
     require MT::Blog;
     my $template_ids = $plugin->get_config_value(
-        'shared_categories_template_ids'
+        'shared_categories_template_ids' . ($type eq 'folder' ? '_folder' : '')
     ) || [];
     my @metas = MT::Blog->meta_pkg->search(
         {
@@ -48,6 +49,7 @@ sub replace_blog_id {
 	@blog_ids ? \@blog_ids : 0;
 }
 
+my %save_plugin_data;
 sub init_request {
 	my ($cb, $app) = @_;
     $plugin = $cb->{plugin};
@@ -60,7 +62,8 @@ sub init_request {
 		my ($class, $args, $cond) = @_;
 
 		if (ref $args) {
-			if (my $blog_id = &replace_blog_id($args->{'blog_id'} || 0)) {
+			my $type = $class->class_type;
+			if (my $blog_id = &replace_blog_id($type, $args->{'blog_id'} || 0)) {
 				$args->{'blog_id'} = $blog_id;
 			}
 		}
@@ -73,7 +76,8 @@ sub init_request {
 		my ($class, $args, $cond) = @_;
 
 		if (ref $args) {
-			if (my $blog_id = &replace_blog_id($args->{'blog_id'} || 0)) {
+			my $type = $class->class_type;
+			if (my $blog_id = &replace_blog_id($type, $args->{'blog_id'} || 0)) {
 				$args->{'blog_id'} = $blog_id;
 			}
 		}
@@ -105,15 +109,34 @@ sub init_request {
             $cat_path_to_category->(@_);
         };
     }
+
+
+	return unless $app->can('param');
+
+
+	my $blog_id = $app->param('blog_id') || 0;
+	if (! $blog_id) {
+		foreach my $k (
+			'shared_categories_blog_id_sets',
+			'shared_categories_template_ids',
+			'shared_categories_blog_id_sets_folder',
+			'shared_categories_template_ids_folder',
+		) {
+			$save_plugin_data{$k} = $plugin->get_config_value($k) || [];
+		}
+	}
 }
 
-sub category_pre_save {
-	my ($cb, $obj, $original) = @_;
+sub pre_save_inner {
+	my ($class, $cb, $obj, $original) = @_;
+	my $type = $class->class_type;
+	my $key =
+		'shared_categories_fix_blog_id' . ($type eq 'folder' ? '_folder' : '');
 
-	if ($plugin->get_config_value('shared_categories_fix_blog_id')) {
-        if (my $related = &replace_blog_id($obj->blog_id)) {
+	if ($plugin->get_config_value($key)) {
+        if (my $related = &replace_blog_id($type, $obj->blog_id)) {
             if ($obj->parent) {
-                my $parent = MT::Category->load($obj->parent);
+                my $parent = $class->load($obj->parent);
                 $obj->blog_id($parent->blog_id);
             }
         }
@@ -122,15 +145,25 @@ sub category_pre_save {
     1;
 }
 
-sub source_list_category {
-	my ($cb, $app, $tmpl) = @_;
+sub category_pre_save {
+	require MT::Category;
+	&pre_save_inner('MT::Category', @_);
+}
 
-    require MT::Category;
+sub folder_pre_save {
+	require MT::Folder;
+	&pre_save_inner('MT::Folder', @_);
+}
+
+sub source_list_inner {
+	my ($class, $cb, $app, $tmpl) = @_;
+
     require JSON;
     my $blog_id = $app->param('blog_id') || 0;
-    my @cats = MT::Category->load({
+    my @cats = $class->load({
         'blog_id' => $blog_id,
     });
+	my $type = $class->class_type;
     my %objs = map({ $_->id, $_->blog_id } @cats);
     my $json = JSON::objToJson(\%objs);
     my $script = <<__EOS__;
@@ -141,10 +174,10 @@ var elms = document.getElementsByTagName('a');
 var i;
 for (i = 0; i < elms.length; i++) {
     var a = elms[i];
-    var m = a.href.match(/(__mode=view&_type=category&blog_id=)(\\d+)(&id=)(\\d+)/);
+    var m = a.href.match(/(__mode=view&_type=$type&blog_id=)(\\d+)(&id=)(\\d+)/);
     if (m) {
         a.href = a.href.replace(
-            /(__mode=view&_type=category&blog_id=)(\\d+)(&id=)(\\d+)/,
+            /(__mode=view&_type=$type&blog_id=)(\\d+)(&id=)(\\d+)/,
             m[1] + arr[m[4]] + m[3] + m[4]
         );
     }
@@ -158,9 +191,24 @@ __EOS__
     1;
 }
 
+sub source_list_category {
+	require MT::Category;
+	&source_list_inner('MT::Category', @_);
+}
+
+sub source_list_folder {
+	require MT::Folder;
+	&source_list_inner('MT::Folder', @_);
+}
+
 sub _hdlr_if_by_blog_id {
     my ($ctx, $args, $cond) = @_;
     my $app = MT->instance;
+
+	my $type = 'category';
+	if ($ctx->this_tag =~ m/folders?$/i) {
+		$type = 'folder';
+	}
     
     my $blog_id = $args->{'blog_id'};
     if (! ref $blog_id) {
@@ -172,7 +220,7 @@ sub _hdlr_if_by_blog_id {
 	} @$blog_id);
 
     my $blog_id_sets = $plugin->get_config_value(
-        'shared_categories_blog_id_sets'
+        'shared_categories_blog_id_sets' . ($type eq 'folder' ? '_folder' : '')
     ) || [];
 
     foreach my $set (@$blog_id_sets) {
@@ -196,11 +244,16 @@ sub _hdlr_if_template_set {
     my $app = MT->instance;
     my $blog_id = $ctx->stash('blog_id') || $ctx->var('blog_id') || $app->param('blog_id') || 0;
 
+	my $type = 'category';
+	if ($ctx->this_tag =~ m/folders?$/i) {
+		$type = 'folder';
+	}
+
     require MT::Blog;
     my $blog = MT::Blog->load($blog_id) || MT::Blog->new;
     my $id = $blog->template_set;
     my $template_ids = $plugin->get_config_value(
-        'shared_categories_template_ids'
+        'shared_categories_template_ids' . ($type eq 'folder' ? '_folder' : '')
     ) || [];
 
     grep($id eq $_, @$template_ids);
@@ -224,32 +277,6 @@ sub source_blog_config {
 	$$str =~ s/\$blog_id/$blog_id/g;
 }
 
-my ($save_blog_id_sets, $save_template_ids);
-sub plugin_data_pre_save {
-	my ($cb, $obj, $original) = @_;
-	my $app = MT->instance;
-
-	if (! $app->can('param')) {
-		return 1;
-	}
-
-	if (lc($app->param('plugin_sig')) ne $plugin->id) {
-		return 1;
-	}
-
-	my $blog_id = $app->param('blog_id') || 0;
-	if (! $blog_id) {
-		$save_blog_id_sets = $plugin->get_config_value(
-			'shared_categories_blog_id_sets'
-		) || [];
-		$save_template_ids = $plugin->get_config_value(
-			'shared_categories_template_ids'
-		) || [];
-	}
-
-	return 1;
-}
-
 sub plugin_data_post_save {
 	my ($cb, $obj, $original) = @_;
 	my $app = MT->instance;
@@ -264,88 +291,98 @@ sub plugin_data_post_save {
 
 	my $blog_id = $app->param('blog_id') || 0;
 	if (! $blog_id) {
-		$plugin->set_config_value(
-			'shared_categories_blog_id_sets', $save_blog_id_sets
-		);
-		$plugin->set_config_value(
-			'shared_categories_template_ids', $save_template_ids
-		);
+		foreach my $k (
+			'shared_categories_blog_id_sets',
+			'shared_categories_template_ids',
+			'shared_categories_blog_id_sets_folder',
+			'shared_categories_template_ids_folder',
+		) {
+			$plugin->set_config_value($k, $save_plugin_data{$k});
+		}
 		return 1;
 	}
 
-	my $blog_id_sets = $plugin->get_config_value(
-		'shared_categories_blog_id_sets'
-	) || [];
-	my $template_ids = $plugin->get_config_value(
-		'shared_categories_template_ids'
-	) || [];
+	my $inner = sub {
+		my $type = shift;
+		my $pf =  $type eq 'folder' ? '_folder' : '';
 
-	require MT::Blog;
-	my $blog = MT::Blog->load($blog_id) || MT::Blog->new;
-	my $blog_set = $blog->template_set;
-	if ($app->param('template_set')) {
-		if (! grep($blog_set eq $_, @$template_ids)) {
-			push(@$template_ids, $blog_set);
+		my $blog_id_sets = $plugin->get_config_value(
+			'shared_categories_blog_id_sets' . $pf,
+		) || [];
+		my $template_ids = $plugin->get_config_value(
+			'shared_categories_template_ids' . $pf,
+		) || [];
+
+		require MT::Blog;
+		my $blog = MT::Blog->load($blog_id) || MT::Blog->new;
+		my $blog_set = $blog->template_set;
+		if ($app->param('template_set' . $pf)) {
+			if (! grep($blog_set eq $_, @$template_ids)) {
+				push(@$template_ids, $blog_set);
+			}
 		}
-	}
-	else {
-		@$template_ids = grep($blog_set ne $_, @$template_ids);
-	}
+		else {
+			@$template_ids = grep($blog_set ne $_, @$template_ids);
+		}
 
 
-	if ($app->param('with_blog_id')) {
-		@$blog_id_sets = grep({
-			my $set = $_;
-			not scalar(grep({$blog_id == $_} @$set));
-		} @$blog_id_sets);
+		if ($app->param('with_blog_id' . $pf)) {
+			@$blog_id_sets = grep({
+				my $set = $_;
+				not scalar(grep({$blog_id == $_} @$set));
+			} @$blog_id_sets);
 
-		my @blog_ids = $app->param('sc_blog_id');
-		if (scalar(@blog_ids) >= 2) {
-			push(@$blog_id_sets, \@blog_ids);
+			my @blog_ids = $app->param('sc_blog_id' . $pf);
+			if (scalar(@blog_ids) >= 2) {
+				push(@$blog_id_sets, \@blog_ids);
 
-			my $old_blog_id_sets_length;
-			do {
-				$old_blog_id_sets_length = scalar(@$blog_id_sets);
-				my @new_id_sets = ();
+				my $old_blog_id_sets_length;
+				do {
+					$old_blog_id_sets_length = scalar(@$blog_id_sets);
+					my @new_id_sets = ();
 
-				MARGE_SET_LOOP:
-				foreach my $set (@$blog_id_sets) {
-					foreach my $nset (@new_id_sets) {
-						foreach my $id (@$set) {
-							if (grep($id == $_, @$nset)) {
-								foreach my $i (@$set) {
-									if (! grep($i == $_, @$nset)) {
-										push(@$nset, $i);
+					MARGE_SET_LOOP:
+					foreach my $set (@$blog_id_sets) {
+						foreach my $nset (@new_id_sets) {
+							foreach my $id (@$set) {
+								if (grep($id == $_, @$nset)) {
+									foreach my $i (@$set) {
+										if (! grep($i == $_, @$nset)) {
+											push(@$nset, $i);
+										}
 									}
+									next MARGE_SET_LOOP;
 								}
-								next MARGE_SET_LOOP;
 							}
 						}
+
+						push(@new_id_sets, [ @$set ]);
 					}
 
-					push(@new_id_sets, [ @$set ]);
-				}
-
-				$blog_id_sets = \@new_id_sets;
-			} until ($old_blog_id_sets_length == scalar(@$blog_id_sets));
+					$blog_id_sets = \@new_id_sets;
+				} until ($old_blog_id_sets_length == scalar(@$blog_id_sets));
+			}
 		}
-	}
-	else {
-		foreach my $set (@$blog_id_sets) {
-			for (my $i = 0; $i < scalar(@$set); $i++) {
-				if ($set->[$i] == $blog_id) {
-					splice(@$set, $i, 1);
+		else {
+			foreach my $set (@$blog_id_sets) {
+				for (my $i = 0; $i < scalar(@$set); $i++) {
+					if ($set->[$i] == $blog_id) {
+						splice(@$set, $i, 1);
+					}
 				}
 			}
 		}
-	}
 
-	$plugin->set_config_value(
-		'shared_categories_blog_id_sets', $blog_id_sets
-	);
-	$plugin->set_config_value(
-		'shared_categories_template_ids', $template_ids
-	);
+		$plugin->set_config_value(
+			'shared_categories_blog_id_sets' . $pf, $blog_id_sets
+		);
+		$plugin->set_config_value(
+			'shared_categories_template_ids' . $pf, $template_ids
+		);
+	};
+
+	$inner->('category');
+	$inner->('folder');
 }
 
 1;

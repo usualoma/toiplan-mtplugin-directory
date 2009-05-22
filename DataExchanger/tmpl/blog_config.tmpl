@@ -1,0 +1,104 @@
+<input type="hidden" id="data_exchanger_config_beacon" name="data_exchanger_config_beacon" value="1"/>
+
+<style type="text/css">
+.formats dt {
+}
+
+.formats dd {
+	margin-left: 20px;
+}
+</style>
+
+<mtapp:setting
+	id="data_exchanger_select_file_entry"
+	label="<__trans phrase="Entries">"
+>
+<ul><li>
+<input type="submit" name="entry" id="data_exchanger_select_file_entry" value="<__trans phrase="Import">"/>
+<input type="submit" name="entry" id="data_exchanger_export_file_entry" value="<__trans phrase="Export">"/>
+</li></ul>
+</mtapp:setting>
+
+<mtapp:setting
+	id="data_exchanger_select_file_page"
+	label="<__trans phrase="Pages">"
+>
+<ul><li>
+<input type="submit" name="page" id="data_exchanger_select_file_page" value="<__trans phrase="Import">"/>
+<input type="submit" name="page" id="data_exchanger_export_file_page" value="<__trans phrase="Export">"/>
+</li></ul>
+</mtapp:setting>
+
+<mtapp:setting
+	id="data_exchanger_select_file_category"
+	label="<__trans phrase="Categories">"
+>
+<ul><li>
+<input type="submit" name="category" id="data_exchanger_select_file_category" value="<__trans phrase="Import">"/>
+<input type="submit" name="category" id="data_exchanger_export_file_category" value="<__trans phrase="Export">"/>
+</li></ul>
+</mtapp:setting>
+
+<__trans phrase="The file with the following formats can be uploaded."><br />
+
+<dl class="formats">
+<dt>YAML</dt>
+<dd>.yaml</dd>
+<dd>.yml</dd>
+<dt>JSON</dt>
+<dd>.js</dd>
+<dt>CSV</dt>
+<dd>.csv</dd>
+</dl>
+
+<script type="text/javascript">
+setTimeout(function() {
+	var beacon = document.getElementById('data_exchanger_config_beacon');
+	var divs = beacon.form.getElementsByTagName('div');
+	for (var i = 0; i < divs.length; i++) {
+		if (divs[i].className.match(/settings-actions-bar/)) {
+			divs[i].style.display = 'none';
+		}
+	}
+}, 1000);
+(function() {
+
+function data_exchanger_select_file_onclick() {
+	openDialog(
+		false,
+		'data_exchanger_select_file',
+		'blog_id=' + blog_id + '&_type=' + this.name
+	);
+
+	return false;
+};
+
+function data_exchanger_export_file_onclick() {
+	openDialog(
+		false,
+		'data_exchanger_export_file',
+		'blog_id=' + blog_id + '&_type=' + this.name
+	);
+
+	return false;
+};
+
+var blog_id = document.getElementById('data_exchanger_config_beacon').form['blog_id'].value;
+
+document.getElementById('data_exchanger_select_file_entry').onclick =
+	data_exchanger_select_file_onclick;
+document.getElementById('data_exchanger_export_file_entry').onclick =
+	data_exchanger_export_file_onclick;
+
+document.getElementById('data_exchanger_select_file_page').onclick =
+	data_exchanger_select_file_onclick;
+document.getElementById('data_exchanger_export_file_page').onclick =
+	data_exchanger_export_file_onclick;
+
+document.getElementById('data_exchanger_select_file_category').onclick =
+	data_exchanger_select_file_onclick;
+document.getElementById('data_exchanger_export_file_category').onclick =
+	data_exchanger_export_file_onclick;
+
+})();
+</script>

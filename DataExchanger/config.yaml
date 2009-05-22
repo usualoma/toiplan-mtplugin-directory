@@ -1,0 +1,22 @@
+#plugin information
+id: DataExchanger
+name: DataExchanger
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="A plugin enable to import and export blog's data.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/dataexchanger/
+doc_link: http://tec.toi-planning.net/mt/dataexchanger/manual
+
+#Localization
+l10n_class: DataExchanger::L10N
+
+blog_config_template: blog_config.tmpl
+
+applications:
+    cms:
+        methods:
+            data_exchanger_select_file: DataExchanger::App::data_exchanger_select_file
+            data_exchanger_upload_file: DataExchanger::App::data_exchanger_upload_file

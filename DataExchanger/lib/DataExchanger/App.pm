@@ -22,8 +22,10 @@
 
 package DataExchanger::App;
 
-use POSIX;
 use strict;
+use warnings;
+
+use POSIX;
 
 sub data_exchanger_select_file {
     my $app = shift;

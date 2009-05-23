@@ -20,3 +20,4 @@ applications:
         methods:
             data_exchanger_select_file: DataExchanger::App::data_exchanger_select_file
             data_exchanger_upload_file: DataExchanger::App::data_exchanger_upload_file
+            data_exchanger_export_file: DataExchanger::App::data_exchanger_export_file

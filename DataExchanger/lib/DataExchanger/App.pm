@@ -27,18 +27,75 @@ use warnings;
 
 use POSIX;
 
+my %obj_columns = (
+	'entry' => {
+		'entryid' => 'id',
+		'entrytitle' => 'title',
+		'entrybody' => 'text',
+		'entrymore' => 'text_more',
+		'entryexcerpt' => 'excerpt',
+		'entrydate' => 'authored_on',
+		'entrybasename' => 'basename',
+		'entrykeywords' => 'keywords',
+		'entrystatus' => {
+			'column' => 'status',
+			'import' => sub {
+				my ($obj, $value) = @_;
+				$obj->status(
+					MT::Entry::status_int($value) || MT::Entry::RELEASE()
+				);
+			},
+			'export' => sub {
+				my ($obj) = @_;
+				MT::Entry::status_text($obj->status);
+			},
+		},
+	},
+	'page' => {
+		'pageid' => 'id',
+		'pagetitle' => 'title',
+		'pagebody' => 'text',
+		'pagemore' => 'text_more',
+		'pageexcerpt' => 'excerpt',
+		'pagedate' => 'authored_on',
+		'pagebasename' => 'basename',
+		'pagekeywords' => 'keywords',
+	},
+	'category' => {
+		'categoryid' => 'id',
+		'categorylabel' => 'label',
+		'categorybasename' => 'basename',
+		'categorydescription' => 'description',
+		'parentcategory' => {
+			'column' => 'parent',
+			'import' => sub {
+				my ($obj, $value) = @_;
+				if ($value =~ m/^\d+$/) {
+					$obj->parent($value);
+				}
+				else {
+					my $parent = scalar MT::Category->load({
+						'blog_id' => $obj->blog_id,
+						'label' => $value,
+					});
+					$obj->parent($parent->id) if $parent;
+				}
+			},
+			'export' => sub {
+				my ($obj) = @_;
+				$obj->parent;
+			},
+		},
+	}
+);
+
 sub data_exchanger_select_file {
 	my $app = shift;
 
 	my %param;
 	%param = @_ if @_;
 
-	for my $field (
-		qw( entry_insert edit_field upload_mode require_type asset_select )
-	) {
-		$param{$field} ||= $app->param($field);
-	}
-
+	$param{'require_type'} = $app->param('_type');
 	$param{'upload_mode'} = 'data_exchanger_upload_file';
 
 	$app->load_tmpl('dialog/asset_upload.tmpl', \%param);
@@ -60,7 +117,19 @@ sub _parse_file {
 	}
 	elsif ($ext =~ m/csv/i) {
 		my $obj = [];
-		open(my $fh, '<', $file);
+
+		my $tmp_dir = MT->config('TempDir');
+		require File::Temp;
+		my ($fh, $filename) = File::Temp::tempfile(
+			undef, ($tmp_dir ? (DIR => $tmp_dir) : ()),
+		);
+		print(
+			$fh
+			Encode::encode('utf-8', Encode::decode('CP932',
+				do{ open(my $fh, '<', $file); local $/; <$fh>; }
+			))
+		);
+		seek($fh, 0, 0);
 
 		require Text::CSV_PP;
 		my $csv = Text::CSV_PP->new({binary => 1});
@@ -85,6 +154,8 @@ sub _parse_file {
 
 			push(@$obj, \%entry);
 		}
+
+		close($fh);
 
 		return $obj;
 	}
@@ -174,44 +245,37 @@ sub data_exchanger_upload_file {
 			)
 		);
 	}
-	my $entry_class = MT->model('entry');
-
 	eval {
 		require CustomFields::Util;
 		require CustomFields::Field;
 	};
 	my $has_customfields = ! $@;
 
-	my %defaults = (
-		'entryid' => 'id',
-		'entrytitle' => 'title',
-		'entrybody' => 'text',
-		'entrymore' => 'text_more',
-		'entryexcerpt' => 'excerpt',
-		'entrydate' => 'authored_on',
-		'entrybasename' => 'basename',
-		'entrykeywords' => 'keywords',
-		'entrystatus' => {
-			'column' => 'status',
-			'import' => sub {
-				my ($obj, $value) = @_;
-				$obj->status(
-					MT::Entry::status_int($value) || MT::Entry::RELEASE()
-				);
-			},
-			'export' => sub {
-				my ($obj) = @_;
-				MT::Entry::status_text($obj->status);
-			},
-		},
-	);
+	my $obj_type = $app->param('require_type');
+	my $obj_class = MT->model($obj_type);
+	my %columns = %{ $obj_columns{$obj_type} };
+
+	my $initialize = sub { ; };
+	if ($obj_type eq 'entry') {
+		$initialize = sub {
+			my ($obj) = @_;
+			$obj->status(MT::Entry::RELEASE());
+		};
+	}
+	elsif ($obj_type eq 'page') {
+		$initialize = sub {
+			my ($obj) = @_;
+			$obj->status(MT::Entry::RELEASE());
+		};
+	}
+
 	my $author_id = $app->user->id;
 	my %fields = ();
 	foreach my $e (@$entries) {
-		my $obj = $entry_class->new;
+		my $obj = $obj_class->new;
 		$obj->author_id($author_id);
 		$obj->blog_id($blog_id);
-		$obj->status(MT::Entry::RELEASE());
+		$initialize->($obj);
 		my $meta = {};
 		foreach my $k (keys(%$e)) {
 			my $ek = 'efields_' . $k;
@@ -225,7 +289,7 @@ sub data_exchanger_upload_file {
 				next unless @$value;
 			}
 
-			if (my $kk = $defaults{lc($k)}) {
+			if (my $kk = $columns{lc($k)}) {
 				if ((ref $kk) && (ref $kk->{'import'} eq 'CODE')) {
 					$kk->{'import'}($obj, $value);
 				}
@@ -303,5 +367,66 @@ sub data_exchanger_upload_file {
 
 	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
 }
+
+sub data_exchanger_export_file {
+	my $app = shift;
+
+	my $blog_id = $app->param('blog_id') or return;
+
+	eval {
+		require CustomFields::Util;
+		require CustomFields::Field;
+	};
+	my $has_customfields = ! $@;
+
+	my $obj_type = $app->param('_type');
+	my $obj_class = MT->model($obj_type);
+	my %columns = %{ $obj_columns{$obj_type} };
+	my @column_names = values(%columns);
+	my $get_columns = sub {
+		my ($obj) = @_;
+		map({
+			if (ref $_) {
+				$_->{'export'}($obj);
+			}
+			else {
+				$obj->$_;
+			}
+		} @column_names);
+	};
+	my $res = '';
+
+    require Encode;
+
+	$app->{cgi_headers}{'Cache-Control'} = 'public';
+	$app->{cgi_headers}{'Pragma'} = 'public';
+	$app->{cgi_headers}{'Content-Type'} = 'application/x-msexcel-csv';
+	$app->{cgi_headers}{'Content-Disposition'} = 'attachment; filename=' . $blog_id . '_' . $obj_type . '.csv';
+
+	$res .= Encode::encode('CP932', Encode::decode('utf-8',
+		join(',', keys(%columns)) . "\r\n"
+	));
+
+	my $iter = $obj_class->load_iter({'blog_id' => $blog_id});
+	my $i = 0;
+	my $buf = '';
+	while (my $m = $iter->()) {
+		$i++;
+
+		$buf .= '"' . join('","', map({ (my $str = $_) =~ s/"/""/g; $str; }
+			$get_columns->($m)
+		)) . '"' . "\r\n";
+
+		if ($i % 100 == 0) {
+			$res .= Encode::encode('CP932', Encode::decode('utf-8', $buf));
+			$buf = '';
+		}
+	}
+
+	$res .= Encode::encode('CP932', Encode::decode('utf-8', $buf));
+
+	$res;
+}
+
 
 1;

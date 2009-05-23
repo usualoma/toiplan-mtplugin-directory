@@ -74,12 +74,7 @@ function data_exchanger_select_file_onclick() {
 };
 
 function data_exchanger_export_file_onclick() {
-	openDialog(
-		false,
-		'data_exchanger_export_file',
-		'blog_id=' + blog_id + '&_type=' + this.name
-	);
-
+	location.href = CMSScriptURI + '?__mode=data_exchanger_export_file&blog_id=' + blog_id + '&_type=' + this.name
 	return false;
 };
 

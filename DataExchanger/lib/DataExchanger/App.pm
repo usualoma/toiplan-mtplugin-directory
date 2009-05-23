@@ -61,11 +61,26 @@ sub _parse_file {
 
 		require Text::CSV_PP;
 		my $csv = Text::CSV_PP->new({binary => 1});
-		my $headers = $csv->getline($fh);
-		$csv->column_names(@$headers);
+		my @headers = @{ $csv->getline($fh) };
 
-		while (my $ref = $csv->getline_hr($fh)) {
-			push(@$obj, $ref);
+		while (my $ref = $csv->getline($fh)) {
+			my %entry = ();
+			for (my $i = 0; $i <= $#headers; $i++) {
+				my $h = $headers[$i];
+				if ($entry{$h}) {
+					if (! ref $entry{$h}) {
+						$entry{$h} = [ $entry{$h}, $ref->[$i] ];
+					}
+					else {
+						push(@{ $entry{$h} }, $ref->[$i]);
+					}
+				}
+				else {
+					$entry{$h} = $ref->[$i];
+				}
+			}
+
+			push(@$obj, \%entry);
 		}
 
 		return $obj;
@@ -129,8 +144,10 @@ sub data_exchanger_upload_file {
 	}
 	my $entry_class = MT->model('entry');
 
+	eval {
 		require CustomFields::Util;
 		require CustomFields::Field;
+	};
 	my $has_customfields = ! $@;
 
 	my %defaults = (

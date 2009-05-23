@@ -28,15 +28,16 @@ use warnings;
 use POSIX;
 
 sub data_exchanger_select_file {
-    my $app = shift;
+	my $app = shift;
 
-    my %param;
-    %param = @_ if @_;
+	my %param;
+	%param = @_ if @_;
 
-    for my $field (qw( entry_insert edit_field upload_mode require_type
-      asset_select )) {
-        $param{$field} ||= $app->param($field);
-    }
+	for my $field (
+		qw( entry_insert edit_field upload_mode require_type asset_select )
+	) {
+		$param{$field} ||= $app->param($field);
+	}
 
 	$param{'upload_mode'} = 'data_exchanger_upload_file';
 
@@ -92,21 +93,50 @@ sub _parse_file {
 	}
 }
 
+my %_load_asset_keys = (
+	'assetfilepath' => sub {
+		('file_path' => '%r/' . $_[0]);
+	},
+	'asseturl' => sub {
+		('url' => '%r/' . $_[0]);
+	},
+	'assetfilename' => sub {
+		('file_name' => $_[0]);
+	},
+);
+
+sub _load_asset {
+	my ($blog_id, $v) = @_;
+	my $asset_class = MT->model('asset');
+
+	my @terms = map({
+		my $k = lc($_);
+		$_load_asset_keys{$k} ? $_load_asset_keys{$k}->($v->{$_}) : ();
+	} keys(%$v));
+
+	return undef unless @terms;
+	scalar $asset_class->load({
+		'blog_id' => $blog_id,
+		'class' => {'not' => ''},
+		@terms
+	});
+}
+
 sub data_exchanger_upload_file {
-    my $app = shift;
+	my $app = shift;
 	my $plugin = MT->component('DataExchanger');
 
 	my %param = ();
 
-    if (my $perms = $app->permissions) {
-        return $app->error( $app->translate("Permission denied.") )
-          unless $perms->can_upload;
-    }
+	if (my $perms = $app->permissions) {
+		return $app->error( $app->translate("Permission denied.") )
+			unless $perms->can_upload;
+	}
 
-    $app->validate_magic() or return;
+	$app->validate_magic() or return;
 
-    my $q = $app->param;
-    my ($fh, $info) = $app->upload_info('file');
+	my $q = $app->param;
+	my ($fh, $info) = $app->upload_info('file');
 	if (! $fh) {
 		return data_exchanger_select_file(
 			$app, %param,
@@ -115,14 +145,14 @@ sub data_exchanger_upload_file {
 	}
 
 	my $original_file = $q->param('file') || $q->param('fname');
-    my $original_ext = (File::Basename::fileparse(
+	my $original_ext = (File::Basename::fileparse(
 		$original_file, qr/[A-Za-z0-9]+$/
 	))[2];
 
 	require File::Temp;
 	my ($out, $filename) = File::Temp::tempfile(
-        undef, SUFFIX => '.' . $original_ext
-    );
+		undef, SUFFIX => '.' . $original_ext
+	);
 	while (read($fh, my $cont, 512)) {
 		print($out $cont);
 	}
@@ -161,11 +191,18 @@ sub data_exchanger_upload_file {
 		'entrydate' => 'authored_on',
 		'entrybasename' => 'basename',
 		'entrykeywords' => 'keywords',
-		'entrystatus' => sub {
-			my ($obj, $value) = @_;
-			$obj->status(
-				MT::Entry::status_int($value) || MT::Entry::RELEASE()
-			);
+		'entrystatus' => {
+			'column' => 'status',
+			'import' => sub {
+				my ($obj, $value) = @_;
+				$obj->status(
+					MT::Entry::status_int($value) || MT::Entry::RELEASE()
+				);
+			},
+			'export' => sub {
+				my ($obj) = @_;
+				MT::Entry::status_text($obj->status);
+			},
 		},
 	);
 	my $author_id = $app->user->id;
@@ -178,22 +215,37 @@ sub data_exchanger_upload_file {
 		my $meta = {};
 		foreach my $k (keys(%$e)) {
 			my $ek = 'efields_' . $k;
+			my $value = $e->{$k};
+			if (ref $value eq 'HASH') {
+				$value = &_load_asset($blog_id, $value);
+				next unless $value;
+			}
+			elsif (ref $value eq 'ARRAY') {
+				$value = [ grep($_, map(&_load_asset($blog_id, $_), @$value)) ];
+				next unless @$value;
+			}
 
 			if (my $kk = $defaults{lc($k)}) {
-				if (ref $kk) {
-					if (ref $kk eq 'CODE') {
-						$kk->($obj, $e->{$k});
-					}
+				if ((ref $kk) && (ref $kk->{'import'} eq 'CODE')) {
+					$kk->{'import'}($obj, $value);
 				}
 				else {
-					$obj->$kk($e->{$k});
+					$obj->$kk($value);
 				}
 			}
 			elsif ($obj->has_column($k)) {
-				$obj->$k($e->{$k});
+				$obj->$k($value);
 			}
 			elsif ($obj->has_column($ek)) {
-				$obj->$ek($e->{$k});
+				if (ref $value eq 'ARRAY') {
+					$value = join(',', map($_->id, $value));
+				}
+				elsif (ref $value) {
+					if ($value->isa('MT::Asset')) {
+						$value = $value->id;
+					}
+				}
+				$obj->$ek($value);
 			}
 			elsif ($has_customfields) {
 				my $field = undef;
@@ -207,7 +259,12 @@ sub data_exchanger_upload_file {
 				}
 
 				if ($field) {
-					$meta->{$field->basename} = $e->{$k};
+					if (ref $value) {
+						if ($value->isa('MT::Asset')) {
+							$value = '<form mt:asset-id="' . $value->id . '" class="mt-enclosure mt-enclosure-image" style="display: inline;"><a href="' . $value->url . '">' . $app->translate('Show') . '</a></form>'
+						}
+					}
+					$meta->{$field->basename} = $value;
 				}
 			}
 		}

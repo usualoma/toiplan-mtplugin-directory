@@ -38,6 +38,20 @@ sub init_request {
 
 	my $build_blog_selector = \&MT::App::CMS::build_blog_selector;
 	*MT::App::CMS::build_blog_selector = sub {
+		my $favorite_blogs = \&MT::Author::favorite_blogs;
+		*MT::Author::favorite_blogs = sub {
+			my $self = shift;
+			my $set = ($_[0] && ref $_[0]) ? $_[0] : ();
+			$favs = $self->meta('favorite_blogs', $set) || [];
+
+			my @ids = map({
+				$_->id
+			} MT::Blog->load(
+				undef
+				, {fetchonly => ['id']}));
+
+			[ @ids ];
+		};
 		*MT::Blog::load = sub {
 			my ($class, $args, $cond) = @_;
 			$cond->{limit} =
@@ -52,6 +66,7 @@ sub init_request {
 			$ret = $build_blog_selector->(@_);
 		}
 		*MT::Blog::load = undef;
+		*MT::Author::favorite_blogs = $favorite_blogs;
 
 		wantarray ? @ret : $ret;
 	};

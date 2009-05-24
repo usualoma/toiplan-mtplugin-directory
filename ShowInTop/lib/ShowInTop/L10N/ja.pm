@@ -7,6 +7,7 @@ use vars qw( %Lexicon );
 %Lexicon = (
 	'toi-planning' => 'ToI企画',
 	'Show in top' => 'トップページへ表示する',
+	'Showed in top' => 'トップページへ表示される記事',
 	'Remove from top' => 'トップページへ表示しない',
 );
 

@@ -50,6 +50,15 @@ sub init_request {
 				'permission' => 'administer',
 			}
 		};
+
+		my $filters = ($plugin->{registry}->{list_filters} ||= {});
+		$filters->{entry} = {
+			'show_in_top' => {
+				label => 'Showed in top',
+				order => 50,
+				handler => 'ShowInTop::entry_list_filter_on',
+			},
+		};
     }
 }
 
@@ -105,6 +114,19 @@ sub _hdlr_entries {
         or return $ctx->error($ctx->errstr);
 
     return $result;
+}
+
+
+sub entry_list_filter_on {
+	my ( $terms, $args ) = @_;
+
+	require MT::Entry;
+	$args->{join} = [ MT::Entry->meta_pkg, 'entry_id',
+		{
+			'type' => 'show_in_top',
+			'vinteger' => 1,
+		}
+	];
 }
 
 1;

@@ -1,0 +1,29 @@
+#plugin information
+name: ShowInTop
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="A plugin which enabled to select entry displayed to top page.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/showintop/
+doc_link: http://tec.toi-planning.net/mt//showintop/manual
+
+#Localization
+l10n_class: ShowInTop::L10N
+
+blog_config_template: blog_config.tmpl
+settings:
+    enabled:
+        Default: 0
+
+object_types:
+    entry:
+        show_in_top: integer meta
+
+tags:
+    block:
+        Entries: ShowInTop::_hdlr_entries
+
+callbacks:
+    MT::App::CMS::init_request: ShowInTop::init_request

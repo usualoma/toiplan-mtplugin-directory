@@ -1,0 +1,7 @@
+config.yaml
+lib/SharedPreferences.pm
+lib/SharedPreferences/L10N.pm
+lib/SharedPreferences/L10N/en_us.pm
+lib/SharedPreferences/L10N/ja.pm
+LICENSE
+tmpl/shared_preferences_blog_config.tmpl

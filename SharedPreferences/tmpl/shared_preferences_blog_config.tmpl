@@ -1,0 +1,90 @@
+<input type="hidden" name="shared_preferences_beacon" value="1"/>
+
+<p style="border-bottom: 1px solid #ccc;">
+<__trans phrase="Settings for field.">
+</p>
+
+<mtapp:setting
+	id="field_enabled"
+	label="<__trans phrase="Sharing field's" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="field_enabled" id="field_enabled" <mt:If name="field_enabled">checked="checked"</mt:If> />
+</li>
+</ul>
+
+<div id="field_enabled-panel">
+<ul>
+<mt:Authors need_entry="0">
+<mt:AuthorID setvar="author_id" />
+<li>
+<input type="radio" value="<mt:Var name="author_id" />" name="field_author_id" id="field_author_id_<mt:Var name="author_id" />" <mt:If name="field_author_id" eq="$author_id">checked="checked"</mt:If> /><label for="field_author_id_<mt:Var name="author_id" />">: <mt:AuthorDisplayName /></label>
+</li>
+</mt:Authors>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('field_enabled');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+})();
+</script>
+</mtapp:setting>
+
+
+<p style="border-bottom: 1px solid #ccc;">
+<__trans phrase="Settings for widget.">
+</p>
+
+<mtapp:setting
+	id="widget_enabled"
+	label="<__trans phrase="Sharing widget's" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="widget_enabled" id="widget_enabled" <mt:If name="widget_enabled">checked="checked"</mt:If> />
+</li>
+</ul>
+
+<div id="widget_enabled-panel">
+<ul>
+<mt:Authors need_entry="0">
+<mt:AuthorID setvar="author_id" />
+<li>
+<input type="radio" value="<mt:Var name="author_id" />" name="widget_author_id" id="widget_author_id_<mt:Var name="author_id" />" <mt:If name="widget_author_id" eq="$author_id">checked="checked"</mt:If> /><label for="widget_author_id_<mt:Var name="author_id" />">: <mt:AuthorDisplayName /></label>
+</li>
+</mt:Authors>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('widget_enabled');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+})();
+</script>
+</mtapp:setting>

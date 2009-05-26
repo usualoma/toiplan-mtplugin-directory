@@ -1,0 +1,28 @@
+#plugin name
+name: SharedPreferences
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="Sharing preferences.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/preferences/
+doc_link: http://tec.toi-planning.net/mt/preferences/manual
+
+#Localization
+l10n_class: SharedPreferences::L10N
+
+blog_config_template: shared_preferences_blog_config.tmpl
+
+settings:
+    field_enabled:
+        Default: 0
+    field_author_id:
+        Default: 0
+    widget_enabled:
+        Default: 0
+    widget_author_id:
+        Default: 0
+
+callbacks:
+    MT::App::CMS::pre_run: SharedPreferences::pre_run

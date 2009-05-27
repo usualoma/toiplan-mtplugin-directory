@@ -167,7 +167,7 @@ sub source_list_inner {
     });
 	my $type = $class->class_type;
     my %objs = map({ $_->id, $_->blog_id } @cats);
-    my $json = JSON::objToJson(\%objs);
+    my $json = JSON::to_json(\%objs);
     my $script = <<__EOS__;
 <script type="text/javascript">
 (function() {

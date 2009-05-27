@@ -16,23 +16,25 @@ sub replace_blog_id {
     my $template_ids = $plugin->get_config_value(
         'shared_categories_template_ids' . ($type eq 'folder' ? '_folder' : '')
     ) || [];
-    my @metas = MT::Blog->meta_pkg->search(
-        {
-            'type' => 'template_set',
-            'vchar' => $template_ids,
-        },
-        {
-            'fetchonly' => [ 'blog_id', 'vchar' ],
-        }
-    );
-    foreach my $id (@$template_ids) {
-        my @set = map({
-            $_->vchar eq $id ? ($_->blog_id) : ();
-        } @metas);
-        if (@set) {
-            push(@$blog_id_sets, \@set);
-        }
-    }
+	if (scalar(@$template_ids)) {
+		my @metas = MT::Blog->meta_pkg->search(
+			{
+				'type' => 'template_set',
+				'vchar' => $template_ids,
+			},
+			{
+				'fetchonly' => [ 'blog_id', 'vchar' ],
+			}
+		);
+		foreach my $id (@$template_ids) {
+			my @set = map({
+				$_->vchar eq $id ? ($_->blog_id) : ();
+			} @metas);
+			if (@set) {
+				push(@$blog_id_sets, \@set);
+			}
+		}
+	}
 
 	foreach my $set (@$blog_id_sets) {
 		@blog_ids = map({

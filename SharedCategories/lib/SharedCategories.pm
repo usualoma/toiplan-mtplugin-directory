@@ -59,7 +59,7 @@ sub init_request {
 
 	require MT::Category;
 
-	my $load = *MT::Category::load;
+	my $load = \&MT::Category::load;
 	*MT::Category::load = sub {
 		my ($class, $args, $cond) = @_;
 
@@ -73,7 +73,7 @@ sub init_request {
 		MT::Object::load(@_);
 	};
 
-	my $load_iter = *MT::Category::load_iter;
+	my $load_iter = \&MT::Category::load_iter;
 	*MT::Category::load_iter = sub {
 		my ($class, $args, $cond) = @_;
 
@@ -87,7 +87,7 @@ sub init_request {
 		MT::Object::load_iter(@_);
 	};
 
-	my $count = *MT::Category::count;
+	my $count = \&MT::Category::count;
 	*MT::Category::count = sub {
 		my ($class, $args, $cond) = @_;
 
@@ -100,6 +100,24 @@ sub init_request {
 		MT::Object::count(@_);
 	};
 
+	my $remove = \&MT::Category::remove;
+	*MT::Category::remove = sub {
+		my ($obj, $terms) = @_;
+		my $type = $obj->class_type;
+		my $blog_id = undef;
+
+		if (ref $obj) {
+			$blog_id = &replace_blog_id($type, $obj->blog_id || 0);
+		} else {
+			if (ref $terms eq 'HASH') {
+				$blog_id = &replace_blog_id($type, $terms->{blog_id} || 0);
+			}
+		}
+
+		return if $blog_id && scalar(@$blog_id) >= 2;
+
+		$remove->(@_);
+	};
 
 	if ($plugin->get_config_value('shared_categories_cat_path_patch')) {
         require MT::Template::ContextHandlers;

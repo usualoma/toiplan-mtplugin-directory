@@ -269,6 +269,8 @@ sub data_exchanger_upload_file {
 		};
 	}
 
+	my @reserved = ('categories', 'tags');
+
 	my $author_id = $app->user->id;
 	my %fields = ();
 	foreach my $e (@$entries) {
@@ -278,6 +280,11 @@ sub data_exchanger_upload_file {
 		$initialize->($obj);
 		my $meta = {};
 		foreach my $k (keys(%$e)) {
+
+			if (grep($_ eq $k, @reserved)) {
+				next;
+			}
+
 			my $ek = 'efields_' . $k;
 			my $value = $e->{$k};
 			if (ref $value eq 'HASH') {

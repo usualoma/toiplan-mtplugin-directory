@@ -26,14 +26,14 @@ use warnings;
 use base qw( MT::Plugin );
 
 our $VERSION = '0.1';
-my $plugin  = MT::Plugin::MultiBlogExt->new({
-    id          =>  'multiblogext',
-    name        =>  'MultiBlogExt',
-    description =>  'Extending MultiBlog',
-    version                => $VERSION,
-    author_name            => 'ToI Planning',
-    author_link            => 'http://tec.toi-planning.net/',
-    registry => {
+my $plugin = MT::Plugin::MultiBlogExt->new({
+	id => 'multiblogext',
+	name => 'MultiBlogExt',
+	description => 'Extending MultiBlog',
+	version => $VERSION,
+	author_name => 'ToI Planning',
+	author_link => 'http://tec.toi-planning.net/',
+	registry => {
 		callbacks => {
 			'pre_run' => \&pre_run,
 			'cms_post_delete.entry' => \&cms_post_save,
@@ -50,9 +50,9 @@ sub pre_run {
 }
 
 sub cms_post_save {
-    my $plugin = MT->component('MultiBlog');
-    my ($eh, $app, $obj) = @_;
-	
+	my $plugin = MT->component('MultiBlog');
+	my ($eh, $app, $obj) = @_;
+
 	return if $processed{$obj->blog_id};
 	$processed{$obj->blog_id} = 1;
 

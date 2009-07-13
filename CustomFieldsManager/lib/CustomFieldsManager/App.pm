@@ -141,7 +141,7 @@ sub cf_manager_upload_file {
 
 	my $original_file = $q->param('file') || $q->param('fname');
     my $original_ext = (File::Basename::fileparse(
-		$original_file, qr/[A-Za-z0-9]+$/, $encoding
+		$original_file, qr/[A-Za-z0-9]+$/
 	))[2];
 
 	require File::Temp;
@@ -159,7 +159,7 @@ sub cf_manager_upload_file {
 
 	my $blog_id = $q->param('blog_id') || 0;
 
-	my $fields = &_parse_file($filename, $original_ext);
+	my $fields = &_parse_file($filename, $original_ext, $encoding);
 	if (! ref $fields) {
 		return cf_manager_select_file(
 			$app, %param,

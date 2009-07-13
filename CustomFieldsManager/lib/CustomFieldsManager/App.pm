@@ -26,6 +26,60 @@ use CustomFieldsManager;
 use POSIX;
 use strict;
 
+my @field_defs = (
+	{
+		key => 'blog_id',
+		order => 0,
+		label => 'BlogID',
+	},
+	{
+		key => 'name',
+		order => 1,
+		label => 'Name',
+	},
+	{
+		key => 'description',
+		order => 2,
+		label => 'Description',
+	},
+	{
+		key => 'obj_type',
+		order => 3,
+		label => 'System Object',
+	},
+	{
+		key => 'type',
+		order => 4,
+		label => 'Type',
+	},
+	{
+		key => 'tag',
+		order => 5,
+		label => 'Template Tag',
+	},
+	{
+		key => 'default',
+		order => 6,
+		label => 'Default',
+	},
+	{
+		key => 'options',
+		order => 7,
+		label => 'Options',
+	},
+	{
+		key => 'required',
+		order => 8,
+		label => 'Required?',
+	},
+	{
+		key => 'basename',
+		order => 9,
+		label => 'Basename',
+	},
+);
+shift(@field_defs);
+
 sub cf_manager_select_file {
     my $app = shift;
 
@@ -159,7 +213,13 @@ sub cf_manager_upload_file {
 
 	my $blog_id = $q->param('blog_id') || 0;
 
+	my %label_to_key = map({
+		(MT->translate($_->{label}) => $_->{key});
+	} @field_defs);
+	my %key_to_label = reverse(%label_to_key);
+
 	my $fields = &_parse_file($filename, $original_ext, $encoding);
+
 	if (! ref $fields) {
 		return cf_manager_select_file(
 			$app, %param,
@@ -169,14 +229,20 @@ sub cf_manager_upload_file {
 		);
 	}
 
+	my %required_keys = map(
+		{ $_ => $key_to_label{$_} || $_ }
+		'name', 'basename', 'tag'
+	);
 	$fields = [ grep({
-		$_->{name} && $_->{basename} && $_->{tag}
+		$_->{$required_keys{name}}
+		&& $_->{$required_keys{basename}}
+		&& $_->{$required_keys{tag}}
 	} @$fields) ];
 
 	if (my @dups = grep(scalar(@$_) >= 2, map({
 		my $ff = $_;
 		[ grep({
-			$ff->{basename} eq $_->{basename}
+			$ff->{$required_keys{basename}} eq $_->{$required_keys{basename}}
 		} @$fields) ];
 	} @$fields))) {
 		return cf_manager_select_file(
@@ -190,7 +256,7 @@ sub cf_manager_upload_file {
 	if (my @dups = grep(scalar(@$_) >= 2, map({
 		my $ff = $_;
 		[ grep({
-			$ff->{tag} eq $_->{tag}
+			$ff->{$required_keys{tag}} eq $_->{tag}
 		} @$fields) ];
 	} @$fields))) {
 		return cf_manager_select_file(
@@ -212,9 +278,9 @@ sub cf_manager_upload_file {
 		my $field = $field_class->new;
 		$field->blog_id($blog_id);
 		foreach my $k (keys(%$f)) {
-			if ($field->has_column($k)) {
-				#$field->$k(Jcode->new($f->{$k}, $encoding)->utf8);
-				$field->$k($f->{$k});
+			my $c = $label_to_key{$k} || $k;
+			if ($field->has_column($c)) {
+				$field->$c($f->{$k});
 			}
 		}
 
@@ -223,20 +289,6 @@ sub cf_manager_upload_file {
 
 	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
 }
-
-my @fields = qw(
-	blog_id
-	name
-	description
-	obj_type
-	type
-	tag
-	default
-	options
-	required
-	basename
-);
-shift(@fields);
 
 sub cf_manager_export_file {
     my $app = shift;
@@ -256,20 +308,27 @@ sub cf_manager_export_file {
 	$app->{cgi_headers}{'Content-Type'} = 'application/x-msexcel-csv';
 	$app->{cgi_headers}{'Content-Disposition'} = "attachment; filename=$filename";
 
+	require Jcode;
+
+	my @fields = map($_->{key}, @field_defs);
+	my @labels = map(
+		Jcode->new(MT->translate($_->{label}), 'utf8')->$encoding,
+		@field_defs
+	);
+
 	my $iter = CustomFields::Field->load_iter({
 		blog_id => $blog_id,
 	});
 
 	require Text::CSV;
-	require Jcode;
 
 	my $csv = Text::CSV->new({binary => 1});
-	$csv->combine(@fields);
+	$csv->combine(@labels);
 
 	my $ret = $csv->string() . "\n";
 	while (my $f = $iter->()) {
 		my @cs = ();
-		foreach my $k ( @fields ) {
+		foreach my $k (@fields) {
 			push(@cs, Jcode->new($f->$k, 'utf8')->$encoding);
 		}
 		$csv->combine(@cs);

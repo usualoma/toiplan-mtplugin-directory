@@ -22,9 +22,9 @@ blog_config_template: blog_config.tmpl
 applications:
     cms:
         methods:
-            cf_manager_select_file: CustomFieldsManager::App::cf_manager_select_file
-            cf_manager_upload_file: CustomFieldsManager::App::cf_manager_upload_file
-            cf_manager_export_file: CustomFieldsManager::App::cf_manager_export_file
+            cf_manager_select_file: $CustomFieldsManager::CustomFieldsManager::App::cf_manager_select_file
+            cf_manager_upload_file: $CustomFieldsManager::CustomFieldsManager::App::cf_manager_upload_file
+            cf_manager_export_file: $CustomFieldsManager::CustomFieldsManager::App::cf_manager_export_file
 
 callbacks:
     MT::App::CMS::init_request: CustomFieldsManager::App::init_request

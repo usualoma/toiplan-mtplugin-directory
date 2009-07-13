@@ -1,0 +1,71 @@
+<input type="hidden" id="cf_manager_config_beacon" name="cf_manager_config_beacon" value="1"/>
+
+<mtapp:setting
+	id="cf_manager_encoding"
+	label="<__trans phrase="Encoding">"
+>
+<ul><li>
+<select name="cf_manager_encoding" id="cf_manager_encoding">
+<option value="utf8">UTF-8</option>
+<option value="sjis">Shift_JIS</option>
+</select>
+</li></ul>
+</mtapp:setting>
+
+<style type="text/css">
+.formats dt {
+}
+
+.formats dd {
+	margin-left: 20px;
+}
+</style>
+
+<mtapp:setting
+	id="cf_manager_select_file"
+	label="<__trans phrase="Entries">"
+>
+<ul><li>
+<input type="submit" name="entry" id="cf_manager_select_file" value="<__trans phrase="Import">"/>
+<input type="submit" name="entry" id="cf_manager_export_file" value="<__trans phrase="Export">"/>
+</li></ul>
+</mtapp:setting>
+
+<script type="text/javascript">
+setTimeout(function() {
+	var beacon = document.getElementById('cf_manager_config_beacon');
+	var divs = beacon.form.getElementsByTagName('div');
+	for (var i = 0; i < divs.length; i++) {
+		if (divs[i].className.match(/settings-actions-bar/)) {
+			divs[i].style.display = 'none';
+		}
+	}
+}, 1000);
+(function() {
+
+function cf_manager_select_file_onclick() {
+	var enc = document.getElementById('cf_manager_encoding');
+	openDialog(
+		false,
+		'cf_manager_select_file',
+		'cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id
+	);
+
+	return false;
+};
+
+function cf_manager_export_file_onclick() {
+	var enc = document.getElementById('cf_manager_encoding');
+	window.location.href = CMSScriptURI + '?__mode=cf_manager_export_file&cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id;
+	return false;
+};
+
+var blog_id = document.getElementById('cf_manager_config_beacon').form['blog_id'].value;
+
+document.getElementById('cf_manager_select_file').onclick =
+	cf_manager_select_file_onclick;
+document.getElementById('cf_manager_export_file').onclick =
+	cf_manager_export_file_onclick;
+
+})();
+</script>

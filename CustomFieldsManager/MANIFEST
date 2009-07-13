@@ -1,0 +1,11 @@
+config.yaml
+extlib/Text/CSV.pm
+extlib/Text/CSV_PP.pm
+lib/CustomFieldsManager.pm
+lib/CustomFieldsManager/App.pm
+lib/CustomFieldsManager/L10N.pm
+lib/CustomFieldsManager/L10N/en_us.pm
+lib/CustomFieldsManager/L10N/ja.pm
+LICENSE
+tmpl/blog_config.tmpl
+tmpl/upload_succeeded.tmpl

@@ -1,0 +1,30 @@
+#plugin information
+id: CustomFieldsManager
+name: CustomFieldsManager
+version: 0.1.0
+
+object_types:
+    author:
+        cf_manager_encoding: string meta
+
+#about this plugin
+description: <__trans phrase="A plugin management CustomFields by CSV.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/customfieldsmanager/
+doc_link: http://tec.toi-planning.net/mt/customfieldsmanager/manual
+
+#Localization
+l10n_class: CustomFieldsManager::L10N
+
+blog_config_template: blog_config.tmpl
+
+applications:
+    cms:
+        methods:
+            cf_manager_select_file: CustomFieldsManager::App::cf_manager_select_file
+            cf_manager_upload_file: CustomFieldsManager::App::cf_manager_upload_file
+            cf_manager_export_file: CustomFieldsManager::App::cf_manager_export_file
+
+callbacks:
+    MT::App::CMS::init_request: CustomFieldsManager::App::init_request

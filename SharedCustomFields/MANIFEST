@@ -1,0 +1,8 @@
+config.yaml
+lib/SharedCustomFields.pm
+lib/SharedCustomFields/L10N.pm
+lib/SharedCustomFields/L10N/en_us.pm
+lib/SharedCustomFields/L10N/ja.pm
+LICENSE
+tmpl/shared_customfields_blog_config.tmpl
+tmpl/shared_customfields_system_config.tmpl

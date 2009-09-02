@@ -1,0 +1,39 @@
+#plugin name
+name: SharedCustomFields
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="CustomFields sharing">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/sharedcustomfields/
+doc_link: http://tec.toi-planning.net/mt/sharedcustomfields/manual
+
+#Localization
+l10n_class: SharedCustomFields::L10N
+
+system_config_template: shared_customfields_system_config.tmpl
+blog_config_template: shared_customfields_blog_config.tmpl
+
+settings:
+    shared_customfields_blog_id_sets:
+    shared_customfields_template_ids:
+    shared_customfields_fix_blog_id:
+        Default: 0
+
+tags:
+    function:
+        SharedCustomFieldsBlogTemplateSetLabel: SharedCustomFields::_hdlr_template_set_label
+        SharedCustomFieldsBlogTemplateSetLabelFolder: SharedCustomFields::_hdlr_template_set_label
+    block:
+        IfSharedCustomFieldsByBlogID?: SharedCustomFields::_hdlr_if_by_blog_id
+        IfSharedCustomFieldsTemplateSet?: SharedCustomFields::_hdlr_if_template_set
+        IfSharedCustomFieldsByBlogIDFolder?: SharedCustomFields::_hdlr_if_by_blog_id
+        IfSharedCustomFieldsTemplateSetFolder?: SharedCustomFields::_hdlr_if_template_set
+
+callbacks:
+    MT::App::CMS::init_request: SharedCustomFields::init_request
+    MT::App::CMS::template_source.shared_customfields_blog_config: SharedCustomFields::source_blog_config
+    MT::PluginData::post_save: SharedCustomFields::plugin_data_post_save
+
+    MT::Field::pre_save: SharedCustomFields::field_pre_save

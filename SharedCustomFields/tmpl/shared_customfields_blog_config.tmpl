@@ -1,0 +1,91 @@
+<input type="hidden" name="shared_categories_beacon" value="1"/>
+
+<mtapp:setting
+	id="sc_with_blog_id"
+	label="<__trans phrase="Shared by blog" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="with_blog_id" id="sc_with_blog_id" <mt:IfSharedCustomFieldsByBlogID blog_id="$blog_id">checked="checked"</mt:IfSharedCustomFieldsByBlogID> />
+</li>
+</ul>
+
+<div id="sc_with_blog_id-panel">
+<ul>
+<mt:Blogs ids="all">
+<mt:BlogID setvar="current_blog_id" />
+<mt:If var="current_blog_id" eq="$blog_id">
+<li>
+<input readonly="readonly" style="background: #ccc" type="checkbox" value="<mt:BlogID />" name="sc_blog_id" id="sc_blog_id_<mt:BlogID />" checked="checked" /><label for="sc_blog_id_<mt:BlogID />">: <mt:BlogName/></label><br/>
+</li>
+<mt:Else>
+<li>
+<input type="checkbox" value="<mt:BlogID />" name="sc_blog_id" id="sc_blog_id_<mt:BlogID />" <mt:IfSharedCustomFieldsByBlogID blog_id="$blog_id","\$current_blog_id">checked="checked"</mt:IfSharedCustomFieldsByBlogID> /><label for="sc_blog_id_<mt:BlogID />">: <mt:BlogName/></label><br/>
+</li>
+</mt:If>
+</mt:Blogs>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('sc_with_blog_id');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+
+	var this_blog = getByID('sc_blog_id_$blog_id');
+	function force() {
+		this_blog.checked = 'checked';
+	}
+	this_blog.onclick = force;
+	this_blog.onchange = force;
+})();
+</script>
+</mtapp:setting>
+
+<mtapp:setting
+	id="sc_template_set"
+	label="<__trans phrase="Shared by template-set" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="template_set" value="1" id="sc_template_set" <mt:IfSharedCustomFieldsTemplateSet>checked="checked"</mt:IfSharedCustomFieldsTemplateSet> />
+</li>
+</ul>
+
+<div id="sc_template_set-panel">
+<ul>
+<li>
+<mt:SharedCustomFieldsBlogTemplateSetLabel />
+</li>
+</ul>
+</div>
+
+<script type="text/javascript">
+(function() {
+	var cb = getByID('sc_template_set');
+
+	function update() {
+		if (cb.checked) {
+			getByID(cb.id + '-panel').style.display = '';
+		}
+		else {
+			getByID(cb.id + '-panel').style.display = 'none';
+		}
+	}
+	
+	cb.onclick = update;
+	update();
+})();
+</script>
+</mtapp:setting>

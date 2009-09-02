@@ -1,0 +1,45 @@
+<input type="hidden" name="shared_categories_beacon" value="1"/>
+
+<p style="border-bottom: 1px solid #ccc;">
+<__trans phrase="Settings for categories.">
+</p>
+
+<mtapp:setting
+	id="shared_categories_fix_blog_id"
+	label="<__trans phrase="Fix blog id" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="shared_categories_fix_blog_id" id="shared_categories_fix_blog_id" <mt:If name="shared_categories_fix_blog_id">checked="checked"</mt:If> />
+</li>
+</ul>
+
+</mtapp:setting>
+
+<mtapp:setting
+	id="shared_categories_cat_path_patch"
+	label="<__trans phrase="Fix a bug for MTEntries" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="shared_categories_cat_path_patch" id="shared_categories_cat_path_patch" <mt:If name="shared_categories_cat_path_patch">checked="checked"</mt:If> />
+</li>
+</ul>
+
+</mtapp:setting>
+
+<p style="border-bottom: 1px solid #ccc;">
+<__trans phrase="Settings for folders.">
+</p>
+
+<mtapp:setting
+	id="shared_categories_fix_blog_id_folder"
+	label="<__trans phrase="Fix blog id" />"
+>
+<ul>
+<li>
+<input type="checkbox" name="shared_categories_fix_blog_id_folder" id="shared_categories_fix_blog_id_folder" <mt:If name="shared_categories_fix_blog_id_folder">checked="checked"</mt:If> />
+</li>
+</ul>
+
+</mtapp:setting>

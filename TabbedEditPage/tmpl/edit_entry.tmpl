@@ -1,0 +1,67 @@
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js">
+</script>
+<script type="text/javascript" src="<mt:StaticWebPath />plugins/TabbedEditPage/js/jquery.json-2.2.min.js">
+</script>
+<script type="text/javascript">
+jQuery.noConflict();
+(function() {
+	var $ = jQuery;
+	var settings = $.evalJSON('<mt:Var name="settings" encode_js="q" />');
+	var tabs = $('<ul id="tabbed_edit_page_tabs" />');
+	var actions_bar = $('#main-content-inner div:first');
+
+	var all_fields = $('#main-content-inner > .field, #editor');
+	var editor_toolbars = $('#editor-content-toolbar:visible');
+	var initial_tab = null;
+	$(settings).each(function(i, tab) {
+		var a = $('<a href="#">' + tab.label + '</a>');
+		a.click(function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+
+			all_fields.hide();
+			editor_toolbars.hide();
+			$('#editor-content').
+				css('height', '0px').
+				css('width', '0px').
+				css('visibility', 'hidden');
+			$(tab.fields).each(function(j, f) {
+				if (f == 'text') {
+					$('#editor').show();
+					editor_toolbars.show();
+					$('#editor-content').
+						css('height', '').
+						css('width', '').
+						css('visibility', 'visible');
+				}
+				else {
+					$('#' + f + '-field').show();
+				}
+			});
+
+			all_tabs.removeClass('active');
+			a.addClass('active');
+		});
+		var li = $('<li />');
+		tabs.append(li.append(a));
+		if (i == 0) {
+			initial_tab = a;
+		}
+
+		for (var j = tab.fields.length-1; j >= 0; j--) {
+			actions_bar.after($('#' + tab.fields[j] + '-field'));
+		}
+	});
+	var all_tabs = tabs.find('a');
+	tabs.find('li:last').addClass('last');
+	if (all_tabs.length < 2) {
+		tabs.hide();
+	}
+
+	jQuery(function() {
+		actions_bar.after(tabs);
+		all_fields.removeClass('hidden');
+		initial_tab.trigger('click');
+	});
+})();
+</script>

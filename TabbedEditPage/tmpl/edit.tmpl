@@ -1,0 +1,328 @@
+<mt:setvarblock name="page_title">
+<mt:if name="obj_type" eq="entry">
+<__trans phrase="Settings for Entry" />
+<mt:else>
+<__trans phrase="Settings for Page" />
+</mtif>
+</mt:setvarblock>
+<mt:setvarblock name="system_msg">
+    <div id="msg-container">
+    <mt:if name="updated">
+        <mtapp:statusmsg
+            id="status_message"
+            class="success">
+			<__trans phrase="Updated" />
+        </mtapp:statusmsg>
+    </mt:if>
+    </div>
+</mt:setvarblock>
+<mt:setvarblock name="html_head" append="1">
+<link rel="stylesheet" href="<mt:StaticWebPath />plugins/TabbedEditPage/css/settings.css" type="text/css" media="screen,print" />
+</mt:setvarblock>
+<$mt:include name="include/header.tmpl"$>
+<div id="tep_action_bar">
+<form action="<mt:CGIPath /><mt:AdminScript />" method="post" id="tep_form">
+<input type="hidden" name="__mode" value="tabbed_edit_page_update" />
+<input type="hidden" name="_type" value="<mt:Var name="obj_type" />" />
+<input type="hidden" name="blog_id" value="<mt:BlogID />" />
+
+<input type="hidden" name="settings" id="settings" value="<mt:Var name="settings" encode_html="1" />" />
+
+<select name="enabled" id="enabled">
+<option value="0"><__trans phrase="Disabled" /></option>
+<option value="1" <mt:If name="enabled" eq="1">selected="selected"</mt:If>><__trans phrase="Enabled" /></option>
+</select>
+
+<input type="submit" value="<__trans phrase="Save" />" />
+
+</form>
+</div>
+
+<div id="tep_setting">
+
+<div id="tab_container">
+<ul id="tabs">
+</ul>
+
+<ul id="add_tab_bar">
+<li>
+	<input id="new_label" value="<__trans phrase="A new tab" />" class="wait" />
+	<input type="submit" id="add_tab" value="<__trans phrase="Add tab" />" />
+</ul>
+</ul>
+
+</div>
+
+<div id="tab_contents_container">
+<h3><__trans phrase="Enabled fields:" /></h3>
+<div id="tab_contents">
+<ul id="contents" class="sortable"></ul>
+</div>
+</div>
+
+<div id="field_container_container">
+<h3><__trans phrase="Available fields:" /></h3>
+<div id="field_container">
+<ul id="fields" class="sortable">
+<li id="title"><__trans phrase="Title" /></li>
+<li id="text"><__trans phrase="Body" /></li>
+<li id="tags"><__trans phrase="Tags" /></li>
+<li id="excerpt"><__trans phrase="Excerpt" /></li>
+<li id="keywords"><__trans phrase="Keywords" /></li>
+<mt:Loop name="customfields">
+<li id="customfield_<mt:Var name="basename" />"><mt:Var name="name" /></li>
+</mt:Loop>
+</ul>
+</div>
+</div>
+
+</div>
+
+<div id="tep_action_bar_bottom">
+<form action="<mt:CGIPath /><mt:AdminScript />" method="post" id="tep_form_copy">
+<input type="hidden" name="__mode" value="tabbed_edit_page_copy" />
+<input type="hidden" name="_type" value="<mt:Var name="obj_type" />" />
+<input type="hidden" name="blog_id" value="<mt:BlogID />" />
+
+<select name="from" id="from">
+<option value=""><__trans phrase="Select blog" /></option>
+<mt:BlogID setvar="current_blog_id" />
+<mt:Blogs>
+<mt:If tag="BlogID" ne="$current_blog_id">
+<option value="<mt:BlogID />"><mt:BlogName /></option>
+</mt:If>
+</mt:Blogs>
+</select>
+
+<input type="submit" value="<__trans phrase="Copying" />" />
+
+</form>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.1/jquery.min.js">
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js">
+</script>
+<script type="text/javascript" src="<mt:StaticWebPath />plugins/TabbedEditPage/js/jquery.json-2.2.min.js">
+</script>
+<script type="text/javascript">
+jQuery.noConflict();
+jQuery(function() {
+	var $ = jQuery;
+
+	var tabs = [];
+	(function() {
+		var val = $('#settings').val();
+		if (val) {
+			datas = $.evalJSON(val);
+			$(datas).each(function(i, t) {
+				var fields = [];
+				$(t.fields).each(function(i, id) {
+					var elm = $('#' + id);
+					if (elm) {
+						fields.push(elm.remove().get(0));
+					}
+				});
+
+				var tab = {
+					active: false,
+					label: t.label,
+					fields: fields
+				}
+				tabs.push(tab);
+
+				if (i == 0) {
+					set_active(tab);
+				}
+			});
+		}
+	})();
+
+	var h3_height = null;
+	function update_tabs() {
+		var ul = $('<ul />');
+		$(tabs).each(function(i, t) {
+			var li = $('<li />');
+			var a = $('<a href="#" class="tab">' + t.label + '</a>');
+			if (t.active) {
+				li.addClass('active');
+				a.click(function(ev) {
+					ev.preventDefault();
+					ev.stopPropagation();
+				});
+			}
+			else {
+				a.click(function(ev) {
+					ev.preventDefault();
+					ev.stopPropagation();
+
+					set_active(t);
+					update_tabs();
+				});
+			}
+			var remove = $('<a href="#" class="remove">X</a>');
+			remove.click(function(ev) {
+				ev.preventDefault();
+				ev.stopPropagation();
+
+				$(t.fields).each(function(i, li) {
+					$('#fields').append(li);
+				});
+
+				var new_tabs = [];
+				$(tabs).each(function(j, tab) {
+					if (t.label != tab.label) {
+						new_tabs.push(tab);
+					}
+				});
+				tabs = new_tabs;
+
+				if (t.active) {
+					set_active(tabs[0]);
+				}
+
+				update_tabs();
+			});
+			ul.append(li.append(a, remove));
+		});
+
+		$('#tabs').empty().append(ul.children());
+
+
+		var tab = get_active();
+		if (tab) {
+			$('#contents').empty().append($(tab.fields));
+		}
+
+		setTimeout(function() {
+			if (! h3_height) {
+				h3_height = $('#tab_contents_container h3').height();
+			}
+			$('#tab_contents_container, #field_container_container').css(
+				'min-height',
+				($('#tab_container').height() - 8) + 'px'
+			);
+		}, 0);
+	}
+	update_tabs();
+
+	function set_active(tab) {
+		$(tabs).each(function(i, t) {
+			t.active = false;
+		});
+
+		if (tab) {
+			tab.active = true;
+		}
+	}
+
+	function get_active() {
+		var tab = null;
+		$(tabs).each(function(i, t) {
+			if (t.active) {
+				tab = t;
+				return false;
+			}
+		});
+
+		return tab;
+	}
+
+	var new_label = $('#new_label');
+	new_label.focus(function() {
+		$(this).removeClass('wait').attr('value', '');
+	});
+	$('#add_tab').click(function(ev) {
+		ev.preventDefault();
+		ev.stopPropagation();
+
+		var label = new_label.val();
+		if (! label) {
+			return;
+		}
+
+		var tab = {
+			label: new_label.val(),
+			fields: [],
+		};
+		tabs.push(tab);
+		set_active(tab);
+
+		new_label.val('');
+		update_tabs();
+	});
+
+	$('.sortable').sortable({
+		items: 'li',
+		connectWith: ['.sortable'],
+		stop: function(ev, ui) {
+			var tab = get_active();
+			if (tab) {
+				tab.fields = [];
+				$('#contents li').each(function(i, li) {
+					tab.fields.push(li);
+				});
+			}
+		}
+	});
+
+	$('#tabs').sortable({
+		items: 'li',
+		axis: 'y',
+		stop: function(ev, ui) {
+			var new_tabs = [];
+			$('#tabs li a').each(function(i, a) {
+				var label = $(a).text();
+				$(tabs).each(function(j, t) {
+					if (t.label == label) {
+						new_tabs.push(t);
+					}
+				});
+			});
+			tabs = new_tabs;
+		}
+	});
+
+	$('#enabled').change(function() {
+		if ($('#enabled').val() == 1) {
+			$('#tep_setting').show();
+		}
+		else {
+			$('#tep_setting').hide();
+		}
+	}).trigger('change');
+
+	$('#tep_form').submit(function() {
+		var datas = [];
+		$(tabs).each(function(i, t) {
+			var fields = [];
+			$(t.fields).each(function(i, li) {
+				fields.push(li.id);
+			});
+
+			var hash = {
+				label: t.label,
+				fields: fields
+			};
+
+			datas.push(hash);
+		});
+
+		$('#settings').val(eval($.toJSON(datas)));
+	});
+
+	$('#tep_form_copy').submit(function(ev) {
+		var do_copy = true;
+		if ($('#from').val() == '') {
+			alert('<__trans phrase="The blog has not been selected." />');
+			do_copy = false;
+		}
+
+		if ((! do_copy) || ! window.confirm('<__trans phrase="Copying?" />')) {
+			ev.preventDefault();
+			ev.stopPropagation();
+		}
+	});
+});
+</script>
+<$mt:include name="include/footer.tmpl"$>

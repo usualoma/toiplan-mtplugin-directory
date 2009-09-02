@@ -1,0 +1,90 @@
+#tep_setting {
+	display: none;
+	float: left;
+	margin: 10px 0px;
+	width: 100%;
+}
+#tep_setting h3 {
+	color: white;
+	padding: 5px;
+	margin: 0px;
+}
+#tep_action_bar_bottom {
+	margin-top: 10px;
+}
+
+#tab_container {
+	border: 1px solid #ccc;
+	float: left;
+	width: 290px;
+}
+
+#tab_container input {
+	width: 100px;
+}
+
+input.wait {
+	color: #ccc;
+}
+
+#tabs {
+	width: 285px;
+}
+
+#tabs a {
+	display: block;
+	width: 240px;
+}
+
+#tabs li.active,
+#tabs li.active a {
+	background: #424242;
+	color: white;
+}
+
+#tabs a.remove {
+	display: block;
+	width: 10px;
+}
+
+#tabs a.tab {
+	float: right;
+}
+
+#tab_contents_container {
+	border: 5px solid #424242;
+	background: #424242;
+	float: left;
+	width: 294px;
+}
+#tab_contents_container h3 {
+	background: #424242;
+}
+
+#tab_contents {
+	border: 1px solid #ccc;
+	background: white;
+}
+
+#field_container_container h3 {
+	background: #626262;
+}
+#field_container_container {
+	border: 5px solid #626262;
+	background: #626262;
+	width: 294px;
+	float: left;
+}
+#field_container {
+	border: 1px solid #ccc;
+	background: white;
+}
+
+#tabs, #add_tab_bar, .sortable {
+	padding: 10px;
+}
+.sortable li {
+	cursor: move;
+	padding: 10px 0px 0px 0px;
+	border-bottom: 1px dotted #ccc;
+}

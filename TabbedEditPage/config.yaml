@@ -1,0 +1,41 @@
+#plugin information
+id: TabbedEditPage
+name: TabbedEditPage
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="Create tabbed edit page.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/tabbededitpage/
+doc_link: http://tec.toi-planning.net/mt/tabbededitpage/manual
+
+#Localization
+l10n_class: TabbedEditPage::L10N
+
+blog_config_template: tabbed_edit_page_blog_config.tmpl
+
+settings:
+    enabled_entry:
+        Default:
+    settings_entry:
+    enabled_page:
+        Default:
+    settings_page:
+
+applications:
+    cms:
+        methods:
+            tabbed_edit_page_edit:
+                handler: $TabbedEditPage::TabbedEditPage::App::edit
+                permission: administer_blog,edit_config
+            tabbed_edit_page_update:
+                handler: $TabbedEditPage::TabbedEditPage::App::update
+                permission: administer_blog,edit_config
+            tabbed_edit_page_copy:
+                handler: $TabbedEditPage::TabbedEditPage::App::copy
+                permission: administer_blog,edit_config
+
+callbacks:
+    MT::App::CMS::template_source.edit_entry: $TabbedEditPage::TabbedEditPage::App::source_edit_entry
+    MT::App::CMS::template_source.tabbed_edit_page_blog_config: $TabbedEditPage::TabbedEditPage::App::source_blog_config

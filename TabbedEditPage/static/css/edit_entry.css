@@ -1,0 +1,27 @@
+#tabbed_edit_page_tabs {
+	float: left;
+	clear: both;
+	width: 100%;
+	border-bottom: 2px solid #333;
+}
+#tabbed_edit_page_tabs li {
+	font-size: 14px;
+	float: left;
+}
+#tabbed_edit_page_tabs li a {
+	display: block;
+	padding: 5px 10px;
+	border-width: 0px 2px 0px 0px;
+	border-style: solid;
+	border-color: #333;
+	background: #626262;
+	color: white;
+}
+#tabbed_edit_page_tabs li.last a {
+	border-width: 0px;
+}
+#tabbed_edit_page_tabs li a.active,
+#tabbed_edit_page_tabs li a:hover {
+	background: #424242;
+	color: white;
+}

@@ -1,0 +1,32 @@
+<mtapp:setting
+	id="tabbed_edit_page_edit"
+>
+<input type="submit" id="tabbed_edit_page_edit_for_entry" value="<__trans phrase="Settings for Entry">" />
+<br />
+<input type="submit" id="tabbed_edit_page_edit_for_page" value="<__trans phrase="Settings for Page">" />
+</mtapp:setting>
+<input type="hidden" id="tabbed_edit_page" name="tabbed_edit_page" />
+<script type="text/javascript">
+setTimeout(function() {
+	var buttons = getByID('tabbed_edit_page').form.getElementsByTagName('button');
+	for (var i = 0; i < buttons.length; i++) {
+		buttons[i].style.display = 'none';
+	}
+
+	var button;
+	button = getByID('tabbed_edit_page_edit_for_entry');
+	if (button) {
+		button.onclick = function() {
+			window.location.href = '<mt:CGIPath /><mt:AdminScript />?__mode=tabbed_edit_page_edit&blog_id=$blog_id&_type=entry';
+			return false;
+		}
+	}
+	button = getByID('tabbed_edit_page_edit_for_page');
+	if (button) {
+		button.onclick = function() {
+			window.location.href = '<mt:CGIPath /><mt:AdminScript />?__mode=tabbed_edit_page_edit&blog_id=$blog_id&_type=page';
+			return false;
+		}
+	}
+}, 1000);
+</script>

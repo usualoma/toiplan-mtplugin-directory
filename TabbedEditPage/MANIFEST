@@ -1,0 +1,13 @@
+config.yaml
+lib/TabbedEditPage.pm
+lib/TabbedEditPage/App.pm
+lib/TabbedEditPage/L10N.pm
+lib/TabbedEditPage/L10N/en_us.pm
+lib/TabbedEditPage/L10N/ja.pm
+LICENSE
+static/css/edit_entry.css
+static/css/settings.css
+static/js/jquery.json-2.2.min.js
+tmpl/edit.tmpl
+tmpl/edit_entry.tmpl
+tmpl/tabbed_edit_page_blog_config.tmpl

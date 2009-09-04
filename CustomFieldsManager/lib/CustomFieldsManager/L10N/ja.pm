@@ -21,10 +21,11 @@ use vars qw( %Lexicon );
 	'Duplicated basename(s):' => 'ベースネームが重複しています:',
 	'Duplicated tag(s):' => 'タグが重複しています:',
 
-	'System Object' => 'システムオブジェク',
+	'System Object' => 'システムオブジェクト',
 	'Template Tag' => 'テンプレートタグ',
 	'Default' => '既定値',
 	'Required?' => '必須?',
+	'Basename' => 'ベースネーム',
 );
 
 1;

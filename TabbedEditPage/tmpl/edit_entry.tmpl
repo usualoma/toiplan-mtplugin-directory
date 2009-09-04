@@ -10,7 +10,7 @@ jQuery.noConflict();
 	var tabs = $('<ul id="tabbed_edit_page_tabs" />');
 	var actions_bar = $('#main-content-inner div:first');
 
-	var all_fields = $('#main-content-inner > .field, #editor');
+	var all_fields = $('#main-content-inner > .field, #customfields-loop > .field, #editor');
 	var editor_toolbars = $('#editor-content-toolbar:visible');
 	var initial_tab = null;
 	$(settings).each(function(i, tab) {
@@ -49,7 +49,12 @@ jQuery.noConflict();
 		}
 
 		for (var j = tab.fields.length-1; j >= 0; j--) {
-			actions_bar.after($('#' + tab.fields[j] + '-field'));
+			if (tab.fields[j] == 'text') {
+				actions_bar.after($('#editor, #editor-content'));
+			}
+			else {
+				actions_bar.after($('#' + tab.fields[j] + '-field'));
+			}
 		}
 	});
 	var all_tabs = tabs.find('a');

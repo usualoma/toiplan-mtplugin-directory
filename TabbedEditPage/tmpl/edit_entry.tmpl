@@ -11,7 +11,8 @@ jQuery.noConflict();
 	var actions_bar = $('#main-content-inner div:first');
 
 	var all_fields = $('#main-content-inner > .field, #customfields-loop > .field, #editor');
-	var editor_toolbars = $('#editor-content-toolbar:visible');
+	var editor_toolbars = $('<div />');
+	$('#editor-content-toolbar').wrap(editor_toolbars);
 	var initial_tab = null;
 	$(settings).each(function(i, tab) {
 		var a = $('<a href="#">' + tab.label + '</a>');

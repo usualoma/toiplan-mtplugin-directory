@@ -30,11 +30,11 @@ use base qw( MT::Plugin );
 our $VERSION = '1.0';
 
 MT->add_plugin(MT::Plugin::ExtendibleAuthorField->new({
-    id => 'ExtendibleAuthorField',
-    key => 'addauthorfield',
-    description => 'Enable to extend MT::Author\'s field.',
-    name => 'ExtendibleAuthorField',
-    version => $VERSION,
+	id => 'ExtendibleAuthorField',
+	key => 'addauthorfield',
+	description => 'Enable to extend MT::Author\'s field.',
+	name => 'ExtendibleAuthorField',
+	version => $VERSION,
 	l10n_class  => 'MT::Plugin::ExtendibleAuthorField::L10N',
 }));
 

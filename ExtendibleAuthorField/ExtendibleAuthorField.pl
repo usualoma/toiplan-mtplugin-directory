@@ -35,7 +35,6 @@ MT->add_plugin(MT::Plugin::ExtendibleAuthorField->new({
 	description => 'Enable to extend MT::Author\'s field.',
 	name => 'ExtendibleAuthorField',
 	version => $VERSION,
-	l10n_class  => 'MT::Plugin::ExtendibleAuthorField::L10N',
 }));
 
 sub init_app {

@@ -97,6 +97,7 @@ sub data_exchanger_select_file {
 
 	$param{'require_type'} = $app->param('_type');
 	$param{'upload_mode'} = 'data_exchanger_upload_file';
+	$param{'dialog'} = 1;
 
 	$app->load_tmpl('dialog/asset_upload.tmpl', \%param);
 }
@@ -375,6 +376,20 @@ sub data_exchanger_upload_file {
 	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
 }
 
+sub decode {
+	my $str = shift;
+	if (! utf8::is_utf8($str)) {
+		$str = Encode::decode('utf-8', $str);
+	}
+
+	if ($MT::VERSION < 5) {
+		Encode::encode('CP932', $str);
+	}
+	else {
+		$str;
+	}
+}
+
 sub data_exchanger_export_file {
 	my $app = shift;
 
@@ -409,10 +424,9 @@ sub data_exchanger_export_file {
 	$app->{cgi_headers}{'Pragma'} = 'public';
 	$app->{cgi_headers}{'Content-Type'} = 'application/x-msexcel-csv';
 	$app->{cgi_headers}{'Content-Disposition'} = 'attachment; filename=' . $blog_id . '_' . $obj_type . '.csv';
+	$app->charset('CP932');
 
-	$res .= Encode::encode('CP932', Encode::decode('utf-8',
-		join(',', keys(%columns)) . "\r\n"
-	));
+	$res .= &decode(join(',', keys(%columns)) . "\r\n");
 
 	my $iter = $obj_class->load_iter({'blog_id' => $blog_id});
 	my $i = 0;
@@ -425,12 +439,12 @@ sub data_exchanger_export_file {
 		)) . '"' . "\r\n";
 
 		if ($i % 100 == 0) {
-			$res .= Encode::encode('CP932', Encode::decode('utf-8', $buf));
+			$res .= &decode($buf);
 			$buf = '';
 		}
 	}
 
-	$res .= Encode::encode('CP932', Encode::decode('utf-8', $buf));
+	$res .= &decode($buf);
 
 	$res;
 }

@@ -1,7 +1,7 @@
 #plugin information
 id: DataExchanger
 name: DataExchanger
-version: 0.1.0
+version: 0.2.0
 
 #about this plugin
 description: <__trans phrase="A plugin enable to import and export blog's data.">

@@ -77,7 +77,7 @@ sub archive_asset_select_file {
 	MT::CMS::Asset::_set_start_upload_params($app, \%param);
 
     for my $field (qw( entry_insert edit_field upload_mode require_type
-      asset_select )) {
+      asset_select dialog )) {
         $param{$field} ||= $app->param($field);
     }
 
@@ -236,7 +236,7 @@ sub archive_index_select_file {
 	MT::CMS::Asset::_set_start_upload_params($app, \%param);
 
     for my $field (qw( entry_insert edit_field upload_mode require_type
-      asset_select )) {
+      asset_select dialog )) {
         $param{$field} ||= $app->param($field);
     }
 

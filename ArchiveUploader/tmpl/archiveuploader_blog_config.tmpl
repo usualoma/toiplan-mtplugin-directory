@@ -51,24 +51,38 @@ setTimeout(function() {
 
 var blog_id = document.getElementById('archive_uploader_config_beacon').form['blog_id'].value;
 
+function myOpenDialog(mode, param) {
+	if (
+		(typeof(jQuery) == 'undefined')
+		|| (typeof(jQuery.mtAddEdgeClass) == 'undefined')
+	) {
+		openDialog(false, mode, param);
+	}
+	else {
+		jQuery('<a />').
+			attr(
+				'href', ScriptURI + '?' + '__mode=' + mode + '&' + param
+			).
+			insertAfter('#footer').
+			mtDialog().
+			trigger('click');
+	}
+	return false;
+}
+
+
 document.getElementById('archive_asset_select_file').onclick = function() {
-	openDialog(
-		false,
+	return myOpenDialog(
 		'archive_asset_select_file',
 		'blog_id=' + blog_id
 	);
-
-	return false;
 };
 
 document.getElementById('archive_index_select_file').onclick = function() {
-	openDialog(
-		false,
+	return myOpenDialog(
 		'archive_index_select_file',
 		'blog_id=' + blog_id
 	);
-
-	return false;
 };
 
 

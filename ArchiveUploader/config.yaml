@@ -1,7 +1,7 @@
 #plugin information
 id: ArchiveUploader
 name: ArchiveUploader
-version: 0.2.0
+version: 0.3.0
 
 #about this plugin
 description: <__trans phrase="A plugin which help to upload asset and index-template.">

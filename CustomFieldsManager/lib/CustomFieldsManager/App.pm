@@ -87,7 +87,7 @@ sub cf_manager_select_file {
     %param = @_ if @_;
 
     for my $field (qw( entry_insert edit_field upload_mode require_type
-      asset_select )) {
+      asset_select dialog )) {
         $param{$field} ||= $app->param($field);
     }
 
@@ -214,7 +214,11 @@ sub cf_manager_upload_file {
 	my $blog_id = $q->param('blog_id') || 0;
 
 	my %label_to_key = map({
-		(MT->translate($_->{label}) => $_->{key});
+		my $label = MT->translate($_->{label});
+		if (utf8::is_utf8($label)) {
+			$label = Encode::encode('utf-8', $label);
+		}
+		($label => $_->{key});
 	} @field_defs);
 	my %key_to_label = reverse(%label_to_key);
 
@@ -233,7 +237,8 @@ sub cf_manager_upload_file {
 		{ $_ => $key_to_label{$_} || $_ }
 		'name', 'basename', 'tag'
 	);
-	$fields = [ grep({
+
+ 	$fields = [ grep({
 		$_->{$required_keys{name}}
 		&& $_->{$required_keys{basename}}
 		&& $_->{$required_keys{tag}}
@@ -290,6 +295,20 @@ sub cf_manager_upload_file {
 	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
 }
 
+sub decode {
+	my ($str, $encoding) = @_;
+	if (! utf8::is_utf8($str)) {
+		$str = Encode::decode('utf-8', $str);
+	}
+
+	if ($MT::VERSION < 5) {
+		Encode::encode($encoding, $str);
+	}
+	else {
+		$str;
+	}
+}
+
 sub cf_manager_export_file {
     my $app = shift;
 	my $plugin = CustomFieldsManager->instance;
@@ -307,12 +326,13 @@ sub cf_manager_export_file {
 	$app->{cgi_headers}{'Pragma'} = 'public';
 	$app->{cgi_headers}{'Content-Type'} = 'application/x-msexcel-csv';
 	$app->{cgi_headers}{'Content-Disposition'} = "attachment; filename=$filename";
+	$app->charset($encoding);
 
 	require Jcode;
 
 	my @fields = map($_->{key}, @field_defs);
 	my @labels = map(
-		Jcode->new(MT->translate($_->{label}), 'utf8')->$encoding,
+		&decode(MT->translate($_->{label}), $encoding),
 		@field_defs
 	);
 
@@ -329,7 +349,7 @@ sub cf_manager_export_file {
 	while (my $f = $iter->()) {
 		my @cs = ();
 		foreach my $k (@fields) {
-			push(@cs, Jcode->new($f->$k, 'utf8')->$encoding);
+			push(@cs, &decode($f->$k, $encoding));
 		}
 		$csv->combine(@cs);
 		$ret .= $csv->string() . "\n";
@@ -372,7 +392,7 @@ sub cf_manager_export_file {
 	foreach my $f (@examples) {
 		my @cs = ();
 		foreach my $k ( @fields ) {
-			push(@cs, Jcode->new(exists($f->{$k}) ? $f->{$k} : '', 'utf8')->$encoding);
+			push(@cs, &decode(exists($f->{$k}) ? $f->{$k} : '', $encoding));
 		}
 		$csv->combine(@cs);
 		$ret .= $csv->string() . "\n";

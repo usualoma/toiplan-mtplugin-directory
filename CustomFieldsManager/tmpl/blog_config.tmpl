@@ -45,11 +45,28 @@ setTimeout(function() {
 
 function cf_manager_select_file_onclick() {
 	var enc = document.getElementById('cf_manager_encoding');
-	openDialog(
-		false,
-		'cf_manager_select_file',
-		'cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id
-	);
+
+	if (
+		(typeof(jQuery) == 'undefined')
+		|| (typeof(jQuery.mtAddEdgeClass) == 'undefined')
+	) {
+		openDialog(
+			false,
+			'cf_manager_select_file',
+			'cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id
+		);
+	}
+	else {
+		jQuery('<a />').
+			attr(
+				'href',
+				ScriptURI + '?' + '__mode=cf_manager_select_file&' +
+				'cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id
+			).
+			insertAfter('#footer')
+			.mtDialog()
+			.trigger('click');
+	}
 
 	return false;
 };

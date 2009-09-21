@@ -30,3 +30,4 @@ applications:
 
 callbacks:
     MT::App::CMS::init_request: ArchiveUploader::init_request
+    MT::App::CMS::template_param.asset_upload: ArchiveUploader::App::param_asset_upload

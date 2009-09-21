@@ -19,6 +19,10 @@ use vars qw( %Lexicon );
 	"[_1] has no files" => '[_1] にはファイルが含まれていません。',
 
 	'ArchiveUpload \'[_1]\' uploaded by \'[_2]\'' => '\'[_2]\'が\'[_1]\'をアップロードしました。',
+
+	'Sort Order' => '登録順序',
+	'Created Time' => '作成日時',
+	'File Name' => 'ファイル名',
 );
 
 1;

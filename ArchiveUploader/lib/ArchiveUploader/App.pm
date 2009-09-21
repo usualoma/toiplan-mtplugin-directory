@@ -43,7 +43,13 @@ sub extract {
 		}
 		if (! $@) {
 			my $tar = Archive::Tar->new;
-			@files = $tar->read($filename, $compressed, { extract => 1 });
+			$tar->read($filename, $compressed);
+			$tar->extract();
+			@files = $tar->list_files([ 'name', 'mtime' ]);
+			foreach (@files) {
+				utime($_->{'mtime'}, $_->{'mtime'}, $_->{'name'});
+			}
+			@files = map($_->{'name'}, @files);
 		}
 	}
 	elsif ($filename =~ m/\.zip$/i) {
@@ -82,8 +88,49 @@ sub archive_asset_select_file {
     }
 
 	$param{'upload_mode'} = 'archive_asset_upload_file';
+	$param{'have_sort_order'} = 1;
 
 	$app->load_tmpl('dialog/asset_upload.tmpl', \%param);
+}
+
+sub param_asset_upload {
+	my ($cb, $app, $param, $tmpl) = @_;
+	my $plugin = ArchiveUploader->instance();
+
+	my $before = $tmpl->getElementById('site_path')
+		or return;
+
+	my $field = $tmpl->createElement('app:setting', {
+		id => 'sort_order',
+		label => $plugin->translate('Sort Order'),
+		label_class => 'top-label',
+		hint => '',
+		show_hint => '0'
+	});
+
+	$field->innerHTML(<<__EOF__);
+<__trans_section component="ArchiveUploader">
+<input type="radio" name="sort_order" id="sort_order_time" value="time" /><label for="sort_order_time">: <__trans phrase="Created Time" /></label>
+&nbsp;
+<input type="radio" name="sort_order" id="sort_order_name" value="name" /><label for="sort_order_name">: <__trans phrase="File Name" /></label>
+</__trans_section>
+__EOF__
+	$tmpl->insertAfter($field, $before);
+}
+
+sub sort_method {
+	my ($q) = @_;
+	my $type = $q->param('sort_order') || '';
+	if ($type eq 'name') {
+		return sub {
+			$a->[1] cmp $b->[1];
+		};
+	}
+	else {
+		return sub {
+			(stat($a->[1]))[9] cmp (stat($b->[1]))[9];
+		}
+	}
 }
 
 sub archive_asset_upload_file {
@@ -180,9 +227,11 @@ sub archive_asset_upload_file {
 		}
 		else {
 			chmod($upload_mode, $path);
-			File::Spec->catfile($short_path, $_);
+			[ File::Spec->catfile($short_path, $_), $path ];
 		}
 	} @$extracted));
+	my $sort_method = &sort_method($q);
+	@files = map($_->[0], sort({ $sort_method->() } @files));
 
 	my $asset_class = $app->model('asset');
 	foreach my $f (@files) {
@@ -241,6 +290,7 @@ sub archive_index_select_file {
     }
 
 	$param{'upload_mode'} = 'archive_index_upload_file';
+	$param{'have_sort_order'} = 1;
 
 	$app->load_tmpl( 'dialog/asset_upload.tmpl', \%param );
 }
@@ -319,9 +369,11 @@ sub archive_index_upload_file {
 			'';
 		}
 		else {
-			$_;
+			[ $_, $path ];
 		}
 	} @$extracted));
+	my $sort_method = &sort_method($q);
+	@files = map($_->[0], sort({ $sort_method->() } @files));
 
 
 	foreach my $f (@files) {

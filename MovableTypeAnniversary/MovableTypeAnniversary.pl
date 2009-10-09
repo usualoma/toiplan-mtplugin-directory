@@ -33,17 +33,17 @@ unshift(@ordinal, '');
 
 use base qw( MT::Plugin );
 
-my $plugin = MT::Plugin::MovableTypeAnniversary->new( {
-    name => 'MovableTypeAnniversary',
-    author_name => 'ToI Planning',
-    author_link => 'http://tec.toi-planning.net/',
-    version => $VERSION,
-    schema_version => $SCHEMA_VERSION,
-} );
+my $plugin = MT::Plugin::MovableTypeAnniversary->new({
+	name => 'MovableTypeAnniversary',
+	author_name => 'ToI Planning',
+	author_link => 'http://tec.toi-planning.net/',
+	version => $VERSION,
+	schema_version => $SCHEMA_VERSION,
+});
 MT->add_plugin( $plugin );
 
 sub init_registry {
-    my $plugin = shift;
+	my $plugin = shift;
 
 	my @msgs = ();
 	my $i = 0;
@@ -108,7 +108,7 @@ __EOF__
 		};
 	}
 
-    $plugin->registry({
+	$plugin->registry({
 		upgrade_functions => \%funcs,
 	});
 }

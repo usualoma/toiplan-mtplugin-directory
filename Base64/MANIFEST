@@ -1,0 +1,13 @@
+config.yaml
+extlib/MIME/Base64/.exists
+extlib/MIME/Base64/Perl.pm
+extlib/MIME/QuotedPrint/Perl.pm
+extlib/MIME/Type.pm
+extlib/MIME/Type.pod
+extlib/MIME/Types.pm
+extlib/MIME/Types.pod
+lib/Base64.pm
+lib/Base64/L10N.pm
+lib/Base64/L10N/en_us.pm
+lib/Base64/L10N/ja.pm
+LICENSE

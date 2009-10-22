@@ -57,15 +57,10 @@ function cf_manager_select_file_onclick() {
 		);
 	}
 	else {
-		jQuery('<a />').
-			attr(
-				'href',
-				ScriptURI + '?' + '__mode=cf_manager_select_file&' +
-				'cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id
-			).
-			insertAfter('#footer')
-			.mtDialog()
-			.trigger('click');
+		jQuery.fn.mtDialog.open(
+			ScriptURI + '?' + '__mode=cf_manager_select_file&' +
+			'cf_manager_encoding=' + enc.options[enc.selectedIndex].value + '&blog_id=' + blog_id
+		);
 	}
 
 	return false;

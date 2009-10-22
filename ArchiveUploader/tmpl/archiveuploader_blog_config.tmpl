@@ -59,13 +59,9 @@ function myOpenDialog(mode, param) {
 		openDialog(false, mode, param);
 	}
 	else {
-		jQuery('<a />').
-			attr(
-				'href', ScriptURI + '?' + '__mode=' + mode + '&' + param
-			).
-			insertAfter('#footer').
-			mtDialog().
-			trigger('click');
+		jQuery.fn.mtDialog.open(
+			ScriptURI + '?' + '__mode=' + mode + '&' + param
+		);
 	}
 	return false;
 }

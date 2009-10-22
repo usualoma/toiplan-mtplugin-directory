@@ -75,15 +75,10 @@ function data_exchanger_select_file_onclick() {
 			);
 	}
 	else {
-		jQuery('<a />').
-			attr(
-				'href',
-				ScriptURI + '?' + '__mode=data_exchanger_select_file&' +
-				'blog_id=' + blog_id + '&_type=' + this.name
-			).
-			insertAfter('#footer').
-			mtDialog().
-			trigger('click');
+		jQuery.fn.mtDialog.open(
+			ScriptURI + '?' + '__mode=data_exchanger_select_file&' +
+			'blog_id=' + blog_id + '&_type=' + this.name
+		);
 	}
 	return false;
 };

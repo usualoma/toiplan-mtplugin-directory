@@ -1,5 +1,4 @@
 config.yaml
-extlib/Text/.exists
 extlib/Text/CSV.pm
 extlib/Text/CSV_PP.pm
 lib/DataExchanger/App.pm

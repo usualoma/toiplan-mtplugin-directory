@@ -57,6 +57,7 @@ sub init_request {
 
 
 	require CustomFields::Field;
+	require CustomFields::Util;
 
 	my $load = \&CustomFields::Field::load;
 	*CustomFields::Field::load = sub {
@@ -113,6 +114,15 @@ sub init_request {
 		#return if $blog_id && scalar(@$blog_id) >= 2;
 
 		MT::Object::remove(@_);
+	};
+
+	my $_get_html = \&CustomFields::Util::_get_html;
+	*CustomFields::Util::_get_html = sub {
+		my ($key, $tmpl_key, $tmpl_param) = @_;
+		if (my $blog = $app->blog) {
+			$tmpl_param->{blog_id} = $blog->id;
+		}
+		$_get_html->(@_);
 	};
 
 	return unless $app->can('param');

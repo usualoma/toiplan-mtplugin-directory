@@ -44,12 +44,29 @@ sub extract {
 		if (! $@) {
 			my $tar = Archive::Tar->new;
 			$tar->read($filename, $compressed);
-			$tar->extract();
 			@files = $tar->list_files([ 'name', 'mtime' ]);
-			foreach (@files) {
-				utime($_->{'mtime'}, $_->{'mtime'}, $_->{'name'});
-			}
-			@files = map($_->{'name'}, @files);
+
+			# $tar->extract();
+			# Extract files
+
+			require Encode::Guess;
+			my $encode = sub {
+				my $guess = Encode::Guess::guess_encoding(
+					join('', map($_->{'name'}, @files)),
+					qw/cp932 euc-jp iso-2022-jp/
+				);
+				ref $guess ? $guess->name : 'utf8';
+			}->();
+
+			@files = map({
+				my $name = $_->{'name'};
+				my $new_name = Encode::encode('utf8', Encode::decode(
+					$encode, $name
+				));
+				$tar->extract_file($name, $new_name);
+				utime($_->{'mtime'}, $_->{'mtime'}, $new_name);
+				$new_name;
+			} @files);
 		}
 	}
 	elsif ($filename =~ m/\.zip$/i) {
@@ -59,7 +76,27 @@ sub extract {
 			my $zip = Archive::Zip->new();
 			$zip->read($filename);
 			@files = $zip->memberNames();
-			$zip->extractTree();
+
+			# $zip->extractTree();
+			# Extract files
+
+			require Encode::Guess;
+			my $encode = sub {
+				my $guess = Encode::Guess::guess_encoding(
+					join('', @files),
+					qw/cp932 euc-jp iso-2022-jp/
+				);
+				ref $guess ? $guess->name : 'utf8';
+			}->();
+
+			@files = map({
+				my $m = $zip->memberNamed($_);
+				my $new_name = Encode::encode('utf8', Encode::decode(
+					$encode, $_
+				));
+				$m->extractToFileNamed($new_name);
+				$new_name;
+			} @files);
 		}
 	}
 	else {
@@ -235,6 +272,10 @@ sub archive_asset_upload_file {
 
 	my $asset_class = $app->model('asset');
 	foreach my $f (@files) {
+		if (! Encode::is_utf8($f)) {
+			$f = Encode::decode('utf8', $f);
+		}
+
 		$f =~ s/^\/*//;
 
     	my $basename = File::Basename::basename($f);
@@ -377,6 +418,10 @@ sub archive_index_upload_file {
 
 
 	foreach my $f (@files) {
+		if (! Encode::is_utf8($f)) {
+			$f = Encode::decode('utf8', $f);
+		}
+
         my $cont = do{
             open(my $fh, '<', File::Spec->catfile($tempdir, $f));
             local $/;

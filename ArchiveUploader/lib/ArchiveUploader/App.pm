@@ -125,7 +125,6 @@ sub archive_asset_select_file {
     }
 
 	$param{'upload_mode'} = 'archive_asset_upload_file';
-	$param{'have_sort_order'} = 1;
 
 	$app->load_tmpl('dialog/asset_upload.tmpl', \%param);
 }
@@ -136,6 +135,8 @@ sub param_asset_upload {
 
 	my $before = $tmpl->getElementById('site_path')
 		or return;
+
+	return if $app->mode !~ /archive_\w+_select_file/;
 
 	my $field = $tmpl->createElement('app:setting', {
 		id => 'sort_order',
@@ -331,7 +332,6 @@ sub archive_index_select_file {
     }
 
 	$param{'upload_mode'} = 'archive_index_upload_file';
-	$param{'have_sort_order'} = 1;
 
 	$app->load_tmpl( 'dialog/asset_upload.tmpl', \%param );
 }

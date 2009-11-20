@@ -1,0 +1,10 @@
+name: MenuSample
+version: 1.0
+
+applications:
+    cms:
+        menus:
+            feedback:
+                permission: administer
+            tools:
+                permission: administer

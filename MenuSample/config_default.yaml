@@ -1,0 +1,142 @@
+name: MenuSample
+version: 1.0
+
+applications:
+    cms:
+        menus:
+            website:
+            website:manage:
+            website:create:
+
+            blog:
+            blog:manage:
+            blog:create:
+
+            user:
+            user:member:
+            user:manage:
+            user:create:
+            user:itemset_action:
+
+            entry:
+            entry:manage:
+            entry:create:
+            entry:category:
+            entry:tag:
+            entry:view_category:
+
+            page:
+            page:manage:
+            page:create:
+            page:folder:
+            page:tag:
+            page:view_folder:
+
+            asset:
+            asset:manage:
+            asset:upload:
+            asset:tag:
+            asset:view_asset:
+            asset:upload_file:
+
+            feedback:
+            feedback:comment:
+            feedback:ping:
+            feedback:view_comment:
+            feedback:view_ping:
+
+            design:
+            design:template:
+            design:widgets:
+            design:themes:
+            design:view_template:
+            design:edit_widget:
+
+            settings:
+            settings:general:
+            settings:compose:
+            settings:feedback:
+            settings:registration:
+            settings:web_services:
+            settings:ip_info:
+            settings:system:
+            settings:user:
+            settings:role:
+            settings:association:
+            settings:view_role:
+
+            tools:
+            tools:search:
+            tools:plugins:
+            tools:import:
+            tools:export:
+            tools:themeexport:
+            tools:backup:
+            tools:restore:
+            tools:notification:
+            tools:activity_log:
+            tools:system_information:
+            tools:do_export_theme:
+
+        compose_menus:
+            compose_menus:
+                menus:
+                    entry:
+                        label: Entry
+                        order: 100
+                        mode: view
+                        args:
+                            _type: entry
+                        permission: create_post
+                        view: blog
+
+                    page:
+                        label: Page
+                        order: 200
+                        mode: view
+                        args:
+                            _type: page 
+                        permission: manage_pages
+                        view:
+                            - blog
+                            - website
+
+                    asset:
+                        label: Asset
+                        order: 300
+                        mode: start_upload
+                        permission: uploadedit_assets
+                        view:
+                            - blog
+                            - website
+
+                    website:
+                        label: Website
+                        order: 200
+                        mode: view
+                        args:
+                            _type: website 
+                        permit_action: use_website:create_menu
+                        view: system
+
+                    user:
+                        label: User
+                        order: 100
+                        mode: view
+                        args:
+                            _type: "author" 
+                        permission: administer
+                        condition: |
+                            sub {
+                                return !MT->config->ExternalUserManagement;
+                            }
+                        view: system
+
+                    blog:create:
+                        label: Blog
+                        order: 400
+                        mode: view
+                        args:
+                            _type: blog 
+                        permit_action: use_blog:create_menu
+                        view: website

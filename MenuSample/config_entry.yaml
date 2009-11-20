@@ -1,0 +1,132 @@
+name: MenuSample
+version: 1.0
+
+applications:
+    cms:
+        menus:
+            # デフォルトの新規作成を隠す
+            entry:create:
+                view: hidden
+            # デフォルトの一覧を隠す
+            entry:manage:
+                view: hidden
+
+            entry:create_news:
+                label: 「ニュース」新規作成
+                order: 100
+                mode: view
+                args:
+                    _type: entry
+                    category_id: 3
+                permission: create_post
+                view: blog
+
+            entry:create_menu:
+                label: 「おすすめ」新規作成
+                order: 200
+                mode: view
+                args:
+                    _type: entry
+                    category_id: 4
+                permission: create_post
+                view: blog
+
+            entry:manage_news:
+                label: 「ニュース」一覧
+                order: 150
+                mode: list_entry
+                args:
+                    filter: category_id
+                    filter_key: list_news
+                    filter_val: 3
+                permit_action: use_entry:manage_menu
+                view:
+                 - blog
+                 - website
+
+            entry:manage_menu:
+                label: 「おすすめ」一覧
+                order: 250
+                mode: list_entry
+                args:
+                    filter: category_id
+                    filter_key: list_menu
+                    filter_val: 4
+                permit_action: use_entry:manage_menu
+                view:
+                 - blog
+                 - website
+
+        compose_menus:
+            compose_menus:
+                menus:
+                    entry_news:
+                        label: ニュース
+                        order: 50
+                        mode: view
+                        args:
+                            _type: entry
+                            category_id: 3
+                        permission: create_post
+                        view: blog
+
+                    entry_menu:
+                        label: おすすめ
+                        order: 60
+                        mode: view
+                        args:
+                            _type: entry
+                            category_id: 4
+                        permission: create_post
+                        view: blog
+
+                    page:
+                        label: Page
+                        order: 200
+                        mode: view
+                        args:
+                            _type: page 
+                        permission: manage_pages
+                        view:
+                            - blog
+                            - website
+
+                    asset:
+                        label: Asset
+                        order: 300
+                        mode: start_upload
+                        permission: uploadedit_assets
+                        view:
+                            - blog
+                            - website
+
+                    website:
+                        label: Website
+                        order: 200
+                        mode: view
+                        args:
+                            _type: website 
+                        permit_action: use_website:create_menu
+                        view: system
+
+                    user:
+                        label: User
+                        order: 100
+                        mode: view
+                        args:
+                            _type: "author" 
+                        permission: administer
+                        condition: |
+                            sub {
+                                return !MT->config->ExternalUserManagement;
+                            }
+                        view: system
+
+                    blog:create:
+                        label: Blog
+                        order: 400
+                        mode: view
+                        args:
+                            _type: blog 
+                        permit_action: use_blog:create_menu
+                        view: website

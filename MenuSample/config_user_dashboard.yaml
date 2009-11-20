@@ -1,0 +1,34 @@
+name: MenuSample
+version: 1.0
+
+applications:
+    cms:
+        menus:
+            ydb_entry:
+                label: ブログ記事
+
+            ydb_entry:create:
+                label: ブログAの記事作成
+                order: 100
+                mode: view
+                args:
+                    _type: entry
+                    blog_id: 2
+                condition: |
+                    sub {
+                        MT->instance->user->permissions(2)->can_create_post
+                    }
+                view: user
+
+            ydb_entry:create_blogb:
+                label: ブログBの記事作成
+                order: 200
+                mode: view
+                args:
+                    _type: entry
+                    blog_id: 3
+                condition: |
+                    sub {
+                        MT->instance->user->permissions(3)->can_create_post
+                    }
+                view: user

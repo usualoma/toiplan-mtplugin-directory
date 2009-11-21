@@ -1,0 +1,26 @@
+#plugin information
+id: PluginDataExporter
+name: PluginDataExporter
+version: 0.1.0
+
+#about this plugin
+description: <__trans phrase="Exporting plugin data as part of the theme.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/plugindataexporter/
+doc_link: http://tec.toi-planning.net/mt/plugindataexporter/manual
+
+#Localization
+l10n_class: PluginDataExporter::L10N
+
+theme_element_handlers:
+    plugin_data:
+        label: PluginData
+        importer:
+            import: $PluginDataExporter::PluginDataExporter::import
+            info: $PluginDataExporter::PluginDataExporter::info
+        exporter:
+            params: plugin_data_export_ids
+            template: $PluginDataExporter::PluginDataExporter::export_template
+            export: $PluginDataExporter::PluginDataExporter::export
+            condition: $PluginDataExporter::PluginDataExporter::condition

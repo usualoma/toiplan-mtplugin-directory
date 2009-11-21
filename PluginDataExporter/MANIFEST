@@ -1,0 +1,7 @@
+config.yaml
+lib/PluginDataExporter.pm
+lib/PluginDataExporter/L10N.pm
+lib/PluginDataExporter/L10N/en_us.pm
+lib/PluginDataExporter/L10N/ja.pm
+LICENSE
+tmpl/export.tmpl

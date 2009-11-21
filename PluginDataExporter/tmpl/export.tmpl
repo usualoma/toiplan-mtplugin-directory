@@ -1,0 +1,84 @@
+<mtapp:listing id="plugin_data" loop="plugins" hide_pager="1" show_actions="0" type="plugin">
+    <mt:if __first__>
+        <thead>
+			<mt:If name="can_manage_system">
+            <tr>
+                <th class="cb" style="width: 10%"><__trans phrase="Blog" /><br /><input type="checkbox" name="id-head" value="all" class="select" id="cb_blog" /></th>
+                <th class="cb" style="width: 10%"><__trans phrase="System" /><br /><input type="checkbox" name="id-head" value="all" class="select" id="cb_system" /></th>
+                <th class="display-name" style="width: 25%"><__trans phrase="Plugins"></th>
+                <th class="description" style="width: 55%"><__trans phrase="Description"></th>
+            </tr>
+			<mt:Else>
+            <tr>
+                <th class="cb"><input type="checkbox" name="id-head" value="all" class="select" id="cb_blog" /></th>
+                <th class="display-name"><__trans phrase="Plugins"></th>
+                <th class="description primary-col"><__trans phrase="Description"></th>
+            </tr>
+			</mt:If>
+        </thead>
+        <tbody>
+    </mt:if>
+            <tr class="<mt:if name="__odd__">odd<mt:else>even</mt:if>">
+                <td class="cb">
+					<mt:If name="blog">
+                    <input
+                        type="checkbox"
+                        name="plugin_data_export_ids"
+                        id="plugin_data_<mt:var name="blog">"
+                        class="select cb_blog"
+                        value="<mt:var name="blog">"
+                        <mt:if name="blog:checked">checked="checked"</mt:if>
+                    />
+					</mt:If>
+                </td>
+				<mt:If name="can_manage_system">
+                <td class="cb">
+					<mt:If name="system">
+                    <input
+                        type="checkbox"
+                        name="plugin_data_export_ids"
+                        id="plugin_data_<mt:var name="system">"
+                        class="select cb_system"
+                        value="<mt:var name="system">"
+                        <mt:if name="system:checked">checked="checked"</mt:if>
+                    />
+					</mt:If>
+                </td>
+				</mt:If>
+                <td class="display-name">
+                    <span style="margin-left: <mt:var name="category_pixel_depth">px;">
+                        <mt:var name="name" escape="html">
+                    <span>
+                </td>
+                <td class="description">
+                    <mt:var name="description" escape="html">
+                </td>
+    </mt:if>
+            </tr>
+    <mt:if __last__>
+        </tbody>
+    </mt:if>
+</mtapp:listing>
+
+<script type="text/javascript">
+jQuery(function($) {
+	$(['cb_blog', 'cb_system']).each(function(i, key) {
+		var all = $('#' + key);
+		all.click(function() {
+			$('.' + key).attr('checked', all.attr('checked'));
+		});
+
+		function onclick() {
+			var all_checked = 'checked';
+			$('.' + key).each(function() {
+				if (! this.checked) {
+					all_checked = '';
+				}
+			});
+			all.attr('checked', all_checked);
+		}
+		$('.' + key).click(onclick);
+		onclick();
+	});
+});
+</script>

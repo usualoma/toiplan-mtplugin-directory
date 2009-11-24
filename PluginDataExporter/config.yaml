@@ -17,7 +17,7 @@ theme_element_handlers:
     plugin_data:
         label: PluginData
         importer:
-            import: $PluginDataExporter::PluginDataExporter::import
+            import: $PluginDataExporter::PluginDataExporter::apply
             info: $PluginDataExporter::PluginDataExporter::info
         exporter:
             params: plugin_data_export_ids

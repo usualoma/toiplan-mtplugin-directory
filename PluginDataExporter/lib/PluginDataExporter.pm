@@ -34,7 +34,7 @@ sub can_manage_system {
 	return MT->instance->user->permissions(0)->can_manage_plugins;
 }
 
-sub import {
+sub apply {
     my ($element, $theme, $obj_to_apply) = @_;
     my $data = $element->{data};
     my $plugindata = MT->model('plugindata');

@@ -1,0 +1,14 @@
+#plugin information
+id: TemplateRebuildButton
+name: TemplateRebuildButton
+version: 1.0.0
+
+#about this plugin
+description: <__trans phrase="Add another rebuild button for template edit page">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt/templaterebuildbutton/
+doc_link: http://tec.toi-planning.net/mt/templaterebuildbutton/manual
+
+callbacks:
+    MT::App::CMS::template_param.edit_template: TemplateRebuildButton::param_edit_template

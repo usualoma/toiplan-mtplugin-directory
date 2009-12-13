@@ -26,12 +26,12 @@ use POSIX;
 use strict;
 
 sub extract {
-    my ($filename, $dist) = @_;
+    my ($filename, $dist, $ignore) = @_;
     my @files = ();
 	my $err = '';
 
 	my $cwd = getcwd();
-	chdir($dist);
+	#chdir($dist);
 
 	if ($filename =~ m/\.tar\.gz$|\.tgz$|\.tar$/i) {
 		my $compressed = $& ne '.tar';
@@ -58,15 +58,21 @@ sub extract {
 				ref $guess ? $guess->name : 'utf8';
 			}->();
 
-			@files = map({
+			@files = grep($_, map({
 				my $name = $_->{'name'};
-				my $new_name = Encode::encode('utf8', Encode::decode(
-					$encode, $name
-				));
-				$tar->extract_file($name, $new_name);
-				utime($_->{'mtime'}, $_->{'mtime'}, $new_name);
-				$new_name;
-			} @files);
+
+				if ($ignore && $name =~ m/$ignore/) {
+					undef;
+				}
+				else {
+					my $new_name = Encode::encode('utf8', Encode::decode(
+						$encode, $name
+					));
+					$tar->extract_file($name, $new_name);
+					utime($_->{'mtime'}, $_->{'mtime'}, $new_name);
+					$new_name;
+				}
+			} @files));
 		}
 	}
 	elsif ($filename =~ m/\.zip$/i) {
@@ -89,14 +95,20 @@ sub extract {
 				ref $guess ? $guess->name : 'utf8';
 			}->();
 
-			@files = map({
+			@files = grep($_, map({
 				my $m = $zip->memberNamed($_);
-				my $new_name = Encode::encode('utf8', Encode::decode(
-					$encode, $_
-				));
-				$m->extractToFileNamed($new_name);
-				$new_name;
-			} @files);
+
+				if ($ignore && $_ =~ m/$ignore/) {
+					undef;
+				}
+				else {
+					my $new_name = Encode::encode('utf8', Encode::decode(
+						$encode, $_
+					));
+					$m->extractToFileNamed($new_name);
+					$new_name;
+				}
+			} @files));
 		}
 	}
 	else {
@@ -125,8 +137,10 @@ sub archive_asset_select_file {
     }
 
 	$param{'upload_mode'} = 'archive_asset_upload_file';
+    $param{dialog} = $app->param('dialog');
+    my $tmpl_file = $app->param('dialog') ? 'dialog/asset_upload.tmpl' : 'asset_upload.tmpl';
 
-	$app->load_tmpl('dialog/asset_upload.tmpl', \%param);
+	$app->load_tmpl($tmpl_file, \%param);
 }
 
 sub param_asset_upload {
@@ -136,7 +150,7 @@ sub param_asset_upload {
 	my $before = $tmpl->getElementById('site_path')
 		or return;
 
-	return if $app->mode !~ /archive_\w+_select_file/;
+	return if $app->mode !~ /archive_\w+_(select|upload)_file/;
 
 	my $field = $tmpl->createElement('app:setting', {
 		id => 'sort_order',
@@ -154,6 +168,21 @@ sub param_asset_upload {
 </__trans_section>
 __EOF__
 	$tmpl->insertAfter($field, $before);
+
+	my $options = $tmpl->createElement('app:setting', {
+		id => 'archive_uploader_options',
+		label => $plugin->translate('Archive Uploader Options'),
+		label_class => 'top-label',
+		hint => '',
+		show_hint => '0'
+	});
+
+	$options->innerHTML(<<__EOF__);
+<__trans_section component="ArchiveUploader">
+<input type="checkbox" name="ignore_macosx" id="ignore_macosx" value="1" checked="checked" /><label for="ignore_macosx">: <__trans phrase="Ignore folder named __MACOSX" /></label>
+</__trans_section>
+__EOF__
+	$tmpl->insertAfter($options, $field);
 }
 
 sub sort_method {
@@ -171,11 +200,21 @@ sub sort_method {
 	}
 }
 
+sub ignore_regexp {
+	my $app = shift;
+	my $ignore_macosx = $app->param('ignore_macosx');
+
+	$ignore_macosx ? qr/__MACOSX/ : undef;
+}
+
 sub archive_asset_upload_file {
     my $app = shift;
 	my $plugin = ArchiveUploader->instance;
 
-	my %param = ('logs' => []);
+	my %param = (
+		'logs' => [],
+    	'dialog' => $app->param('dialog'),
+	);
 
     if (my $perms = $app->permissions) {
         return $app->error( $app->translate("Permission denied.") )
@@ -236,7 +275,7 @@ sub archive_asset_upload_file {
 			);
 	}
 
-    my $extracted = &extract($filename, $basedir);
+    my $extracted = &extract($filename, $basedir, &ignore_regexp($app));
 	if (! ref $extracted || ref $extracted ne 'ARRAY') {
 		return archive_asset_select_file(
 			$app, %param,
@@ -313,7 +352,7 @@ sub archive_asset_upload_file {
 		)
 	});
 
-	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
+	$plugin->load_tmpl('upload_succeeded.tmpl', \%param);
 }
 
 sub archive_index_select_file {
@@ -332,15 +371,20 @@ sub archive_index_select_file {
     }
 
 	$param{'upload_mode'} = 'archive_index_upload_file';
+    $param{dialog} = $app->param('dialog');
+    my $tmpl_file = $app->param('dialog') ? 'dialog/asset_upload.tmpl' : 'asset_upload.tmpl';
 
-	$app->load_tmpl( 'dialog/asset_upload.tmpl', \%param );
+	$app->load_tmpl($tmpl_file, \%param);
 }
 
 sub archive_index_upload_file {
     my $app = shift;
 	my $plugin = ArchiveUploader->instance;
 
-	my %param = ('logs' => []);
+	my %param = (
+		'logs' => [],
+    	'dialog' => $app->param('dialog'),
+	);
 
     if (my $perms = $app->permissions) {
         return $app->error( $app->translate("Permission denied.") )
@@ -388,7 +432,7 @@ sub archive_index_upload_file {
     }
 
     my $tempdir = File::Temp::tempdir( CLEANUP => 1 );
-    my $extracted = &extract($filename, $tempdir);
+    my $extracted = &extract($filename, $basedir, &ignore_regexp($app));
 	if (! ref $extracted) {
 		return archive_asset_select_file(
 			$app, %param,
@@ -465,7 +509,7 @@ sub archive_index_upload_file {
 		)
 	});
 
-	$plugin->load_tmpl('upload_succeeded.tmpl', \%param );
+	$plugin->load_tmpl('upload_succeeded.tmpl', \%param);
 }
 
 sub tag_hdlr_zip {

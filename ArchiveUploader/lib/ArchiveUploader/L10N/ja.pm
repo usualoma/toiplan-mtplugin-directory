@@ -23,6 +23,10 @@ use vars qw( %Lexicon );
 	'Sort Order' => '登録順序',
 	'Created Time' => '作成日時',
 	'File Name' => 'ファイル名',
+
+	'Archive Uploader Options' => 'オプション',
+	'Ignore folder named __MACOSX' => '__MACOSXフォルダ以下を登録しない',
+	'ArchiveUpload' => '一括登録',
 );
 
 1;

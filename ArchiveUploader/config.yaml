@@ -23,10 +23,28 @@ tags:
 applications:
     cms:
         methods:
-            archive_asset_select_file: ArchiveUploader::App::archive_asset_select_file
-            archive_asset_upload_file: ArchiveUploader::App::archive_asset_upload_file
-            archive_index_select_file: ArchiveUploader::App::archive_index_select_file
-            archive_index_upload_file: ArchiveUploader::App::archive_index_upload_file
+            archive_asset_select_file: $ArchiveUploader::ArchiveUploader::App::archive_asset_select_file
+            archive_asset_upload_file: $ArchiveUploader::ArchiveUploader::App::archive_asset_upload_file
+            archive_index_select_file: $ArchiveUploader::ArchiveUploader::App::archive_index_select_file
+            archive_index_upload_file: $ArchiveUploader::ArchiveUploader::App::archive_index_upload_file
+        menus:
+            asset:archive_asset_select:
+                label: ArchiveUpload
+                order: 250
+                mode: archive_asset_select_file
+                permission: upload,edit_assets
+                view:
+                    - blog
+                    - website
+                dialog: 1
+            asset:archive_asset_upload:
+                order: 10000
+                mode: archive_asset_upload_file
+                view:
+                    - blog
+                    - website
+                    - system
+                display: 0
 
 callbacks:
     MT::App::CMS::init_request: ArchiveUploader::init_request

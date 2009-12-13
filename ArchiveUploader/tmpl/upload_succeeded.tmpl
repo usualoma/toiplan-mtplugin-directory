@@ -1,9 +1,15 @@
-<mt:setvarblock name="page_title"><__trans phrase="Upload Succeeded."></mt:setvarblock>
+<mt:setvarblock name="page_title"><__trans_section component="ArchiveUploader"><__trans phrase="Upload Succeeded."></__trans_section></mt:setvarblock>
 
+<mt:If name="dialog">
 <mt:include name="dialog/header.tmpl">
+<mt:Else>
+<mt:include name="include/header.tmpl">
+</mt:If>
 
 <textarea readonly="readonly" style="width: 100%; height: 100%;"><mt:Loop name="logs"><mt:Var name="__value__">
 </mt:Loop></textarea>
+
+<mt:If name="dialog">
 
 <form>
     <div class="actions-bar">
@@ -20,3 +26,6 @@
 </form>
 
 <mt:include name="dialog/footer.tmpl">
+<mt:Else>
+<mt:include name="include/footer.tmpl">
+</mt:If>

@@ -33,9 +33,19 @@ my $class = Module::Build->subclass(
 
 			$_[0]->SUPER::ACTION_test(@_);
 		};
-		sub ACTION_upload_google {
+
+		sub ACTION_google_upload {
 			my ($self) = @_;
-			my $prj = 'toiplan-mtplugin-directory';
+			my @info = `git svn info 2>/dev/null`;
+			if (! @info) {
+				@info = `svn info 2>/dev/null`;
+			}
+			if (! @info) {
+				die;
+			}
+			my $prj = join('', grep($_ =~ m/^Repository Root/, @info));
+			$prj =~ s{.*//|\.googlecode\.com.*}{}gi;
+
 			my $ver = $self->dist_version;
 			my $dist_dir = $self->dist_dir;
 			my $name = $self->dist_name;
@@ -50,6 +60,49 @@ my $class = Module::Build->subclass(
 			system(
 				"googlecode_upload.py -s 'Release $ver (ZIP)' -p $prj -l $name $dist_dir.zip"
 			);
+			unlink("$dist_dir.tar.gz");
+			unlink("$dist_dir.zip");
+		};
+
+		sub ACTION_github_upload {
+			my ($self) = @_;
+			my $repos = `git config --get remote.origin.url`;
+			$repos =~ s/^.*:|\.git[\r\n]*$//g;
+			my $token = `git config --get github.token`;
+			$token =~ s/\r|\n//g;
+			my $user = `git config --get github.user`;
+			$user =~ s/\r|\n//g;
+
+			my $ver = $self->dist_version;
+			my $dist_dir = $self->dist_dir;
+			my $name = $self->dist_name;
+
+			$self->depends_on('dist');
+			#$self->_call_action('distdir');
+			$self->ACTION_distdir;
+			$self->depends_on('zipdist');
+
+			require Net::GitHub::Upload;
+			my $github = Net::GitHub::Upload->new(
+				login => $user,
+				token => $token,
+			);
+
+			# upload a file
+			$github->upload(
+				repos => $repos,
+				name => undef,
+				description => "Release $ver (TGZ)",
+				file  => "$dist_dir.tar.gz",
+			);
+
+			$github->upload(
+				repos => $repos,
+				name => undef,
+				description => "Release $ver (ZIP)",
+				file  => "$dist_dir.zip",
+			);
+
 			unlink("$dist_dir.tar.gz");
 			unlink("$dist_dir.zip");
 		};

@@ -1,0 +1,8 @@
+config.yaml
+lib/HatenaFotolifeAssets.pm
+lib/HatenaFotolifeAssets/L10N.pm
+lib/HatenaFotolifeAssets/L10N/en_us.pm
+lib/HatenaFotolifeAssets/L10N/ja.pm
+LICENSE
+static/img/button.gif
+tmpl/blog_config.tmpl

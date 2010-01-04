@@ -1,0 +1,26 @@
+#plugin information
+id: HatenaFotolifeAssets
+name: HatenaFotolifeAssets
+version: 0.0.1
+
+#about this plugin
+description: <__trans phrase="The image of Hatena Fotolife can be used as Asset of MT." />
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+plugin_link: http://tec.toi-planning.net/mt-column/plugin/hatenafotolifeassets/
+doc_link: http://tec.toi-planning.net/mt-column/plugin/hatenafotolifeassets/
+
+#Localization
+l10n_class: HatenaFotolifeAssets::L10N
+
+settings:
+    HatenaFotolifeUsername:
+
+blog_config_template: blog_config.tmpl
+
+callbacks:
+    MT::App::CMS::init_request: HatenaFotolifeAssets::init_request
+    MT::App::CMS::template_source.archetype_editor: HatenaFotolifeAssets::source_archetype_editor
+
+object_types:
+    asset.hatena_fotolife: HatenaFotolifeAssets::HatenaFotolifeAsset

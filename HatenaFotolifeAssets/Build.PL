@@ -45,6 +45,7 @@ my $class = Module::Build->subclass(
 			}
 			my $prj = join('', grep($_ =~ m/^Repository Root/, @info));
 			$prj =~ s{.*//|\.googlecode\.com.*}{}gi;
+			$prj =~ s/[\r\n]*$//;
 
 			my $ver = $self->dist_version;
 			my $dist_dir = $self->dist_dir;

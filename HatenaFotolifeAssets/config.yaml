@@ -1,7 +1,7 @@
 #plugin information
 id: HatenaFotolifeAssets
 name: HatenaFotolifeAssets
-version: 0.0.1
+version: 0.0.2
 
 #about this plugin
 description: <__trans phrase="The image of Hatena Fotolife can be used as Asset of MT." />

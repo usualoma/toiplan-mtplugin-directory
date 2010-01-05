@@ -33,6 +33,7 @@ use vars qw( %Lexicon );
 
 	'The image of Hatena Fotolife can be used as Asset of MT.' => 'はてなフォトライフのフォトを挿入します',
 	'Insert Hatena Fotolife' => 'はてなフォトライフのフォトを挿入',
+	'Username for Hatena' => 'ユーザーID',
 );
 
 1;

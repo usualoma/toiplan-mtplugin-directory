@@ -193,7 +193,7 @@ sub init_request {
 			require MT::Asset;
 			my $asset_pkg = MT::Asset->handler_for_file($file);
 			my $asset;
-			unless($asset = $asset_pkg->load({ file_path => $file })) {
+			unless($asset = $asset_pkg->load({file_path => '%r/'.$basename})) {
 				$asset = $asset_pkg->new();
 			}
 
@@ -258,6 +258,13 @@ sub init_request {
 sub source_archetype_editor {
 	my ($cb, $app, $tmpl) = @_;
 	my $plugin = $app->component('HatenaFotolifeAssets');
+
+	my $blog = MT->instance->blog
+		or return undef;
+	my $username = $plugin->get_config_value(
+		'HatenaFotolifeUsername', 'blog:' . $blog->id
+	) or return undef;
+
 	(my $static = $app->static_path) =~ s{/+$}{};
 
 	my ($tmpl_line) = ($$tmpl =~ m/^(.*Insert Image.*)/m);

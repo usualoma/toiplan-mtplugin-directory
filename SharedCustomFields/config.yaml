@@ -32,7 +32,7 @@ tags:
         IfSharedCustomFieldsTemplateSetFolder?: SharedCustomFields::_hdlr_if_template_set
 
 callbacks:
-    MT::App::CMS::init_request: SharedCustomFields::init_request
+    init_request: SharedCustomFields::init_request
     MT::App::CMS::template_source.shared_customfields_blog_config: SharedCustomFields::source_blog_config
     MT::PluginData::post_save: SharedCustomFields::plugin_data_post_save
 

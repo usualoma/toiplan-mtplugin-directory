@@ -25,7 +25,7 @@ sub save_filter {
 	my $q = $app->param;
 	my $vars = $q->Vars;
 
-	my $found = 0;
+	my $found = $vars->{'category_ids'};
 
 	foreach my $k (keys(%$vars)) {
 		if ($k =~ m/^add_category_id_\d+/ && $vars->{$k}) {

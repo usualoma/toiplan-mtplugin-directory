@@ -7,12 +7,12 @@ version: 1.0
 l10n_class: EnhancedCategory::L10N
 
 # object types
-schema_version: 0.1
+schema_version: 0.2
 object_types:
     category:
         disabled:
             type: boolean
-            not_null: 1
+            not_null: 0
             default: 0
 
 # settings

@@ -1,6 +1,6 @@
 #plugin name
 name: SharedCustomFields
-version: 0.1.1
+version: 0.1.2
 
 #about this plugin
 description: <__trans phrase="CustomFields sharing">

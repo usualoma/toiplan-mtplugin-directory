@@ -38,13 +38,14 @@ my $class = Module::Build->subclass(
 			my ($self) = @_;
 			my @info = `git svn info 2>/dev/null`;
 			if (! @info) {
-				@info = `svn info 2>/dev/null`;
+				@info = `LANG=C svn info 2>/dev/null`;
 			}
 			if (! @info) {
 				die;
 			}
 			my $prj = join('', grep($_ =~ m/^Repository Root/, @info));
 			$prj =~ s{.*//|\.googlecode\.com.*}{}gi;
+			$prj =~ s/[\r\n]*//g;
 
 			my $ver = $self->dist_version;
 			my $dist_dir = $self->dist_dir;

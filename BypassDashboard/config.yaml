@@ -1,0 +1,15 @@
+#plugin information
+id: BypassDashboard
+name: BypassDashboard
+version: 0.1
+
+#about this plugin
+description: <__trans phrase="A plugin enables user that have permission for only one blog to go directly to blog's dashboard without user dashboard.">
+author_name: <__trans phrase="toi-planning">
+author_link: http://tec.toi-planning.net/
+
+#Localization
+l10n_class: BypassDashboard::L10N
+
+callbacks:
+    MT::App::CMS::pre_run: $BypassDashboard::BypassDashboard::pre_run

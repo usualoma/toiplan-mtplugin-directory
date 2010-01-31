@@ -39,7 +39,16 @@ sub pre_run {
 		if (scalar(@perms) == 1) {
 			$app->param('blog_id', $perms[0]->blog_id);
 			$app->delete_param('blog_id') unless $app->is_authorized;
+			$app->request('dashboard_bypassed', 1);
 		}
+	}
+}
+
+sub source_header {
+	my ($cb, $app, $tmpl) = @_;
+
+	if ($app->request('dashboard_bypassed')) {
+		$$tmpl =~ s/Your Dashboard/Dashboard/g;
 	}
 }
 

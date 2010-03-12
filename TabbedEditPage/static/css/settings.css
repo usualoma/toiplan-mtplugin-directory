@@ -56,6 +56,7 @@ input.wait {
 	background: #424242;
 	float: left;
 	width: 294px;
+	_width: 270px;
 }
 #tab_contents_container h3 {
 	background: #424242;
@@ -73,6 +74,7 @@ input.wait {
 	border: 5px solid #626262;
 	background: #626262;
 	width: 294px;
+	_width: 270px;
 	float: left;
 }
 #field_container {

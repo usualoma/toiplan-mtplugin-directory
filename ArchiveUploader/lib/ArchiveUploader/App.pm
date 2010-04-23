@@ -31,7 +31,7 @@ sub extract {
 	my $err = '';
 
 	my $cwd = getcwd();
-	#chdir($dist);
+	chdir($dist);
 
 	if ($filename =~ m/\.tar\.gz$|\.tgz$|\.tar$/i) {
 		my $compressed = $& ne '.tar';

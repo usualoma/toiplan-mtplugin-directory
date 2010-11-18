@@ -75,4 +75,10 @@ __EOH__
     $tmpl->insertAfter($field, $description);
 }
 
+sub cms_pre_save_category {
+    my ( $cb, $app, $category, $original ) = @_;
+    $category->disabled($app->param('disabled') ? 1 : 0);
+    1;
+}
+
 1;

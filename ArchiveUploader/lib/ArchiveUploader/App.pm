@@ -26,7 +26,7 @@ use POSIX;
 use strict;
 
 sub extract {
-    my ($filename, $dist, $ignore) = @_;
+    my ($filename, $dist, $allowed_filename) = @_;
     my @files = ();
 	my $err = '';
 
@@ -61,7 +61,7 @@ sub extract {
 			@files = grep($_, map({
 				my $name = $_->{'name'};
 
-				if ($ignore && $name =~ m/$ignore/) {
+				if (! $allowed_filename->($name)) {
 					undef;
 				}
 				else {
@@ -98,7 +98,7 @@ sub extract {
 			@files = grep($_, map({
 				my $m = $zip->memberNamed($_);
 
-				if ($ignore && $_ =~ m/$ignore/) {
+				if (! $allowed_filename->($_)) {
 					undef;
 				}
 				else {
@@ -200,11 +200,44 @@ sub sort_method {
 	}
 }
 
-sub ignore_regexp {
+sub allowed_filename_func {
 	my $app = shift;
 	my $ignore_macosx = $app->param('ignore_macosx');
+	my (@deny_exts, @allow_exts);
 
-	$ignore_macosx ? qr/__MACOSX/ : undef;
+	if ( my $deny_exts = $app->config->DeniedAssetFileExtensions ) {
+		@deny_exts = map {
+			if   ( $_ =~ m/^\./ ) { qr/$_/i }
+			else                  { qr/\.$_/i }
+		} split '\s?,\s?', $deny_exts;
+	}
+	if ( my $allow_exts = $app->config->AssetFileExtensions ) {
+		@allow_exts = map {
+			if   ( $_ =~ m/^\./ ) { qr/$_/i }
+			else                  { qr/\.$_/i }
+		} split '\s?,\s?', $allow_exts;
+	}
+
+	sub {
+		my ($name) = @_;
+		return undef if $ignore_macosx && $name =~ /__MACOSX/o;
+
+		if (@deny_exts) {
+			my @ret = File::Basename::fileparse( $name, @deny_exts );
+			if ( $ret[2] ) {
+				return undef;
+			}
+		}
+
+		if (@allow_exts) {
+			my @ret = File::Basename::fileparse( $name, @allow_exts );
+			unless ( $ret[2] ) {
+				return undef;
+			}
+		}
+
+		return 1;
+	};
 }
 
 sub archive_asset_upload_file {
@@ -216,10 +249,13 @@ sub archive_asset_upload_file {
     	'dialog' => $app->param('dialog'),
 	);
 
-    if (my $perms = $app->permissions) {
-        return $app->error( $app->translate("Permission denied.") )
-          unless $perms->can_upload;
-    }
+	if ( my $perms = $app->permissions ) {
+		return $app->error( $app->translate("Permission denied.") )
+			unless $perms->can_do('upload');
+	}
+	else {
+		return $app->error( $app->translate("Permission denied.") );
+	}
 
     $app->validate_magic() or return;
 
@@ -275,7 +311,7 @@ sub archive_asset_upload_file {
 			);
 	}
 
-    my $extracted = &extract($filename, $basedir, &ignore_regexp($app));
+    my $extracted = &extract($filename, $basedir, &allowed_filename_func($app));
 	if (! ref $extracted || ref $extracted ne 'ARRAY') {
 		return archive_asset_select_file(
 			$app, %param,
@@ -386,10 +422,13 @@ sub archive_index_upload_file {
     	'dialog' => $app->param('dialog'),
 	);
 
-    if (my $perms = $app->permissions) {
-        return $app->error( $app->translate("Permission denied.") )
-          unless $perms->can_edit_templates;
-    }
+	if ( my $perms = $app->permissions ) {
+		return $app->error( $app->translate("Permission denied.") )
+			unless $perms->can_do('edit_templates');
+	}
+	else {
+		return $app->error( $app->translate("Permission denied.") );
+	}
 
     $app->validate_magic() or return;
 
@@ -432,7 +471,7 @@ sub archive_index_upload_file {
     }
 
     my $tempdir = File::Temp::tempdir( CLEANUP => 1 );
-    my $extracted = &extract($filename, $basedir, &ignore_regexp($app));
+    my $extracted = &extract($filename, $basedir, &allowed_filename_func($app));
 	if (! ref $extracted) {
 		return archive_asset_select_file(
 			$app, %param,

@@ -58,6 +58,7 @@ sub init_request {
 
 
 	require MT::Category;
+	no warnings 'redefine';
 
 	my $load = \&MT::Category::load;
 	*MT::Category::load = sub {

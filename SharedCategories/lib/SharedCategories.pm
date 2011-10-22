@@ -61,18 +61,41 @@ sub init_request {
 	no warnings 'redefine';
 
 	my $load = \&MT::Category::load;
-	*MT::Category::load = sub {
-		my ($class, $args, $cond) = @_;
+	if ($app->param('__mode') eq 'save_entry') {
+		*MT::Category::load = sub {
+			my ($class, $args, $cond) = @_;
 
-		if (ref $args) {
-			my $type = $class->class_type;
-			if (my $blog_id = &replace_blog_id($type, $args->{'blog_id'} || 0)) {
-				$args->{'blog_id'} = $blog_id;
+			if (ref $args) {
+				my $type = $class->class_type;
+				if (my $blog_id = &replace_blog_id($type, $args->{'blog_id'} || 0)) {
+					$args->{'blog_id'} = $blog_id;
+				}
 			}
-		}
 
-		MT::Object::load(@_);
-	};
+			if (wantarray) {
+				MT::Object::load(@_);
+			}
+			else {
+				my $obj = MT::Object::load(@_);
+				$obj->blog_id($app->param('blog_id'));
+				$obj;
+			}
+		};
+	}
+	else {
+		*MT::Category::load = sub {
+			my ($class, $args, $cond) = @_;
+
+			if (ref $args) {
+				my $type = $class->class_type;
+				if (my $blog_id = &replace_blog_id($type, $args->{'blog_id'} || 0)) {
+					$args->{'blog_id'} = $blog_id;
+				}
+			}
+
+			MT::Object::load(@_);
+		};
+	}
 
 	my $load_iter = \&MT::Category::load_iter;
 	*MT::Category::load_iter = sub {

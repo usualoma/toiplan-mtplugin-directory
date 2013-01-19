@@ -32,7 +32,7 @@ sub pre_run {
 	if ($app->mode eq 'dashboard') {
 		require MT::Permission;
 		my @perms = MT::Permission->load(
-			{ 'author_id' => $user->id, },
+			{ 'author_id' => $user->id, 'blog_id' => {not => 0} },
 			{ 'fetch_only' => [ 'blog_id' ] }
 		);
 

@@ -1,7 +1,7 @@
 #plugin information
 id: BypassDashboard
 name: BypassDashboard
-version: 0.11
+version: 0.12
 
 #about this plugin
 description: <__trans phrase="A plugin enables user that have permission for only one blog to go directly to blog's dashboard without user dashboard.">

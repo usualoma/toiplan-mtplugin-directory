@@ -272,8 +272,6 @@ sub cf_manager_upload_file {
 		);
 	}
 
-	require Jcode;
-
 	my $field_class = MT->model('field');
 	$field_class->remove({
 		blog_id => $blog_id,
@@ -327,8 +325,6 @@ sub cf_manager_export_file {
 	$app->{cgi_headers}{'Content-Type'} = 'application/x-msexcel-csv';
 	$app->{cgi_headers}{'Content-Disposition'} = "attachment; filename=$filename";
 	$app->charset($encoding);
-
-	require Jcode;
 
 	my @fields = map($_->{key}, @field_defs);
 	my @labels = map(

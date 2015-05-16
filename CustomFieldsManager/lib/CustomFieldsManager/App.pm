@@ -320,12 +320,6 @@ sub cf_manager_export_file {
 
 	my $encoding = $q->param('cf_manager_encoding') || 'sjis';
 
-	$app->{cgi_headers}{'Cache-Control'} = 'public';
-	$app->{cgi_headers}{'Pragma'} = 'public';
-	$app->{cgi_headers}{'Content-Type'} = 'application/x-msexcel-csv';
-	$app->{cgi_headers}{'Content-Disposition'} = "attachment; filename=$filename";
-	$app->charset($encoding);
-
 	my @fields = map($_->{key}, @field_defs);
 	my @labels = map(
 		&decode(MT->translate($_->{label}), $encoding),
@@ -394,7 +388,13 @@ sub cf_manager_export_file {
 		$ret .= $csv->string() . "\n";
 	}
 
-	$ret;
+    $app->{no_print_body} = 1;
+    $app->set_header('Cache-Control' => 'public');
+    $app->set_header('Pragma' => 'public');
+    $app->set_header('Content-Disposition' => "attachment; filename=$filename");
+    $app->send_http_header('application/x-msexcel-csv');
+
+    $app->print(Encode::encode($encoding, $ret));
 }
 
 sub init_request {
